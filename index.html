@@ -5,6 +5,44 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+        }
+        body {
+            padding: 10px;
+        }
+
+        fieldset {
+            padding: 15px;
+            
+            margin-bottom: 10px;
+        }
+
+        main {
+            width: fit-content;
+            margin: auto;
+            padding: 5px;
+            background-color: rgba(128, 128, 128, 0.582);
+        }
+
+        h1 {
+            font-size: 1em;
+            text-align: center;
+            padding: 4px 0px;
+        }
+
+        input[type="number"]:focus {
+            background-color: rgba(51, 234, 206, 0.399);
+        }
+
+        p {
+            padding: 10px 0px;
+        }
+
+    </style>
 </head>
 
 <body>
@@ -12,6 +50,7 @@
         <main>
             <h1>Leitura Dária de Rotina de Centrífugas</h1>
             <form>
+
                 <fieldset>
                     <legend>GELADA</legend>
                     <label for="inTemp-entrada-GEL">
@@ -87,6 +126,7 @@
                     </label>
                 </fieldset>
 
+
                 <fieldset>
                     <legend>LUBRIF</legend>
                     <label for="inTempOleo">
@@ -104,11 +144,11 @@
                     <label for="inNivel-oleo-carter">
                         <p>
                             Nível do óleo do cárter
-
                         </p>
-                        <input type="number" name="inNivel-oleo-carter" id="inNivel-oleo-carter" placeholder="0,1/4,1/2 3/4 CH">
+                        <input type="number" name="inNivel-oleo-carter" id="inNivel-oleo-carter"
+                            placeholder="0,1/4,1/2 3/4 CH">
                     </label>
-                <fieldset>
+                </fieldset>
 
                 <fieldset>
                     <legend>REFRIGERANTE</legend>
@@ -118,8 +158,31 @@
                         </p>
                         <input type="number" name="inPress-evap" id="inPress-evap" placeholder="KPA">
                     </label>
+                    <label for="inPress-cond">
+                        <p>
+                            Pressão de Condensação
+                        </p>
+                        <input type="number" name="inPress-cond" id="inPress-cond" placeholder="KPA">
+                    </label>
+                    <label for="inTemp-evap">
+                        <p>
+                            Temperatura de Evaporação
+                        </p>
+                        <input type="number" name="inTemp-evap" id="inTemp-evap" placeholder="C°">
+                    </label>
+                    <label for="inTemp-cond">
+                        <p>
+                            Temperatura de Condensação
+                        </p>
+                        <input type="number" name="inTemp-cond" id="inTemp-cond" placeholder="C°">
+                    </label>
+                </fieldset>
+                
+                <fieldset>
+                    <legend>ELÉTRICA</legend>
 
                 </fieldset>
+
             </form>
         </main>
     </div>
