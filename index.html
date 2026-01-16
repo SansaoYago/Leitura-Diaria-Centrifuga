@@ -40,12 +40,18 @@
                         <input type="number" name="inPress-saida-GEL" id="inPress-saida-GEL" placeholder="Kg/cm&sup2">
                     </label>
                 </fieldset>
-                <label for="inDeltaEvap">
-                    <p>
-                        Delta de Temp. Approach (Evaporação)
-                    </p>
-                    <input type="number" name="inDeltaEvap" id="inDeltaEvap" placeholder="C°">
-                </label>
+
+                <fieldset>
+                    <legend>EVAPORAÇÃO</legend>
+                    <label for="inDeltaEvap">
+                        <p>
+                            Delta de Temp. Approach (Evaporação)
+                        </p>
+                        <input type="number" name="inDeltaEvap" id="inDeltaEvap" placeholder="C°">
+                    </label>
+                </fieldset>
+
+
                 <fieldset>
                     <legend>CONDENSAÇÃO</legend>
                     <label for="inTemp-entrada-CON">
@@ -79,6 +85,40 @@
                         </p>
                         <input type="number" name="inPress-saida-CON" id="inPress-saida-CON" placeholder="Kg/cm&sup2">
                     </label>
+                </fieldset>
+
+                <fieldset>
+                    <legend>LUBRIF</legend>
+                    <label for="inTempOleo">
+                        <p>
+                            Temp. do Óleo
+                        </p>
+                        <input type="number" name="inTempOleo" id="inTempOleo" placeholder="C°">
+                    </label>
+                    <label for="inPress-util">
+                        <p>
+                            Pressão Util do Óleo
+                        </p>
+                        <input type="number" name="inPress-util" id="inPress-util" placeholder="KPA">
+                    </label>
+                    <label for="inNivel-oleo-carter">
+                        <p>
+                            Nível do óleo do cárter
+
+                        </p>
+                        <input type="number" name="inNivel-oleo-carter" id="inNivel-oleo-carter" placeholder="0,1/4,1/2 3/4 CH">
+                    </label>
+                <fieldset>
+
+                <fieldset>
+                    <legend>REFRIGERANTE</legend>
+                    <label for="inPress-evap">
+                        <p>
+                            Pressão de Evaporação
+                        </p>
+                        <input type="number" name="inPress-evap" id="inPress-evap" placeholder="KPA">
+                    </label>
+
                 </fieldset>
             </form>
         </main>
