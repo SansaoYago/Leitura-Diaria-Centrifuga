@@ -35,6 +35,13 @@
             writing-mode: vertical-rl;
             transform: rotate(180deg);
         }
+
+        .check {
+            display: inline-block;
+            min-width: 30px;
+            height: 20px;
+            border: 1px solid;
+        }
     </style>
 </head>
 
@@ -115,11 +122,11 @@
                 <th rowspan="2" class="text-vertical">Press. de <br> condensação</th>
                 <th rowspan="2" class="text-vertical">Temp. de <br>evaporação</th>
                 <th rowspan="2" class="text-vertical">Temp. de <br>condensação</th>
-                
+
             </tr>
 
             <tr>
-                <td><b>DATA:</b> <span id="data"></span></td>
+                <td><b>DATA:</b> <span id="data-tabela"></span></td>
             </tr>
             <tr data-horario="02:00">
                 <td>02:00</td>
@@ -240,6 +247,30 @@
             </tr>
             <tr>
                 <td class="nome"></td>
+            </tr>
+            <tr>
+                <th rowspan="2">Ronda nas torres de resfriamento</th>
+            </tr>
+            <tr>
+                <td colspan="5">
+                    02:00 <input type="checkbox" class="check-ok-02:00"> Ok <input type="checkbox"
+                        class="check-nok-02:00"> NOk <br>
+                    08:00 <input type="checkbox" class="check-ok-08:00"> Ok <input type="checkbox"
+                        class="check-nok-08:00"> NOk <br>
+                    14:00 <input type="checkbox" class="check-ok-14:00"> Ok <input type="checkbox"
+                        class="check-nok-14:00"> NOk <br>
+                    20:00 <input type="checkbox" class="check-ok-20:00"> Ok <input type="checkbox"
+                        class="check-nok-20:00"> NOk
+                </td>
+                <td style="text-align: left;" colspan="5">
+                    DEMANDA % = <span></span> <br>
+                    APP EVAP = <span></span> <br>
+                    APP COND = <span></span>
+                </td>
+                <td style="text-align: left; line-height: 25px;" colspan="14">
+                    Operador 1° Turno: <span></span> <br>
+                    Operador 2° Turno: <span></span>
+                </td>
             </tr>
         </thead>
     </table>
