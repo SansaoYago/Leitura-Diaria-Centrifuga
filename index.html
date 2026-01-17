@@ -5,44 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <style>
-        * {
-            padding: 0;
-            margin: 0;
-            box-sizing: border-box;
-        }
-        body {
-            padding: 10px;
-        }
-
-        fieldset {
-            padding: 15px;
-            
-            margin-bottom: 10px;
-        }
-
-        main {
-            width: fit-content;
-            margin: auto;
-            padding: 5px;
-            background-color: rgba(128, 128, 128, 0.582);
-        }
-
-        h1 {
-            font-size: 1em;
-            text-align: center;
-            padding: 4px 0px;
-        }
-
-        input[type="number"]:focus {
-            background-color: rgba(51, 234, 206, 0.399);
-        }
-
-        p {
-            padding: 10px 0px;
-        }
-
-    </style>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
@@ -50,7 +13,20 @@
         <main>
             <h1>Leitura Dária de Rotina de Centrífugas</h1>
             <form>
-
+                <label for="inNome">
+                    <p>
+                        Funcionário
+                    </p>
+                    <input type="text" name="inNome" id="inNome">
+                </label>
+                <select name="chiller" id="chiller">
+                    <option value="1.1">CH1.1</option>
+                    <option value="1.2">CH1.2</option>
+                    <option value="1.3">CH1.3</option>
+                    <option value="2.1">CH2.1</option>
+                    <option value="2.2">CH2.2</option>
+                    <option value="C1">CH.C1</option>
+                </select>
                 <fieldset>
                     <legend>GELADA</legend>
                     <label for="inTemp-entrada-GEL">
@@ -223,10 +199,11 @@
                         <input type="number" name="inDemanda" id="inDemanda">
                     </label>
                 </fieldset>
-
+                <footer><input type="submit" value="REGISTRAR"></footer>
             </form>
         </main>
     </div>
+    <script src="js/script.js"></script>
 </body>
 
 </html>

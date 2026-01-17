@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            padding: 10px;
+        }
+
+        table td,
+        th {
+            border: 1px solid;
+            padding: 5px;
+            text-align: center;
+        }
+
+        #logo {
+            width: 100px;
+        }
+
+        .text-vertical {
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+        }
+    </style>
+</head>
+
+<body>
+    <table>
+        <thead>
+
+            <tr>
+                <th>
+                    <img id="logo" src="img/logo.png" alt="logo">
+                </th>
+                <th colspan="24">LEITURA DIÁRIA DE ROTINA DE CENTRIFUGAS</th>
+            </tr>
+
+            <tr>
+                <th>
+                    N° Chiller
+                </th>
+                <th colspan="10">
+                    ÁGUA
+                </th>
+                <th colspan="3" rowspan="2">LUBRIF</th>
+                <th colspan="4" rowspan="2">REFRIGERANTE</th>
+                <th colspan="7">ELÉTRICA</th>
+            </tr>
+            <tr>
+                <td id="chiller"></td>
+                <th colspan="4">GELADA</th>
+                <th>EVAPORAÇÃO</th>
+                <th colspan="5">CONDENSAÇÃO</th>
+                <th colspan="3">VOLTS</th>
+                <th colspan="3">AMPERES</th>
+                <th>% DEMANDA</th>
+            </tr>
+
+            <tr>
+                <th>UNIDADE</th>
+                <th>°C</th>
+                <th>°C</th>
+                <th>Kg/cm<sup>2</sup></th>
+                <th>Kg/cm<sup>2</sup></th>
+                <th>°C</th>
+                <th>°C</th>
+                <th>°C</th>
+                <th>°C</th>
+                <th>Kg/cm<sup>2</sup></th>
+                <th>Kg/cm<sup>2</sup></th>
+                <th>°C</th>
+                <th>KPA</th>
+                <th class="text-vertical">0,1/4,1/2 3/4 CH</th>
+                <th>KPA</th>
+                <th>KPA</th>
+                <th>°C</th>
+                <th>°C</th>
+                <th>AB<br>RS</th>
+                <th>AC<br>ST</th>
+                <th>BC<br>RT</th>
+                <th>A</th>
+                <th>B</th>
+                <th>C</th>
+                <th></th>
+            </tr>
+            <tr>
+                <th>VALOR NOMINAL</th>
+                <th class="text-vertical">Temp. de<br>entrada</th>
+                <th class="text-vertical">Temp. de<br>saída</th>
+                <th class="text-vertical">Press. de <br>entrada</th>
+                <th class="text-vertical">Press. de <br>saída</th>
+                <th class="text-vertical">Delta de <br> temp <br> approach <br> (Evaporação)</th>
+                <th class="text-vertical">Temp. de<br>entrada</th>
+                <th class="text-vertical">Temp. de<br>saída</th>
+                <th class="text-vertical">Delta de <br> temp <br> approach <br> (Evaporação)</th>
+                <th class="text-vertical">Press. de <br>entrada</th>
+                <th class="text-vertical">Press. de <br>saída</th>
+                <th class="text-vertical">Temp. do<br>óleo</th>
+                <th class="text-vertical">Press. <br>útil do óleo</th>
+                <th class="text-vertical">Nível do <br> óleo do cárter</th>
+                <th class="text-vertical">Press. de <br> evaporação</th>
+                <th class="text-vertical">Press. de <br> condensação</th>
+                <th class="text-vertical">Temp. de <br>evaporação</th>
+                <th class="text-vertical">Temp. de <br>condensação</th>
+                <th id="inABRS" rowspan="2"></th>
+                <th id="inACST" rowspan="2"></th>
+                <th id="inBCRT" rowspan="2"></th>
+                <th id="inA" rowspan="2"></th>
+                <th id="inB" rowspan="2"></th>
+                <th id="inC" rowspan="2"></th>
+                <th id="inDemanda" rowspan="2"></th>
+            </tr>
+
+            <tr>
+                <td><b>DATA:</b> <span id="data"></span></td>
+                <td id="inTemp-entrada-GEL"></td>
+                <td id="inTemp-saida-GEL"></td>
+                <td id="inPress-entrada-GEL"></td>
+                <td id="inPress-saida-GEL"></td>
+                <td id="inDeltaEvap"></td>
+                <td id="inTemp-entrada-CON"></td>
+                <td id="inTemp-saida-CON"></td>
+                <td id="inDeltaCond"></td>
+                <td id="inPress-entrada-CON"></td>
+                <td id="inPress-saida-CON"></td>
+                <td id="inTempOleo"></td>
+                <td id="inPress-util"></td>
+                <td id="inNivel-oleo-carter"></td>
+                <td id="inPress-evap"></td>
+                <td id="inPress-cond"></td>
+                <td id="inTemp-evap"></td>
+                <td id="inTemp-cond"></td>
+            </tr>
+        </thead>
+    </table>
+    <script src="js/script.js"></script>
+</body>
+
+</html>

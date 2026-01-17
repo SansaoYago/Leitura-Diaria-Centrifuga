@@ -1,0 +1,55 @@
+@charset "UTF-8";
+
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+body {
+    padding: 10px;
+}
+
+select {
+    width: 100%;
+}
+
+
+main {
+    width: fit-content;
+    margin: auto;
+    padding: 5px;
+    background-color: rgba(128, 128, 128, 0.582);
+}
+
+h1 {
+    font-size: 1em;
+    text-align: center;
+    padding: 4px 0px;
+}
+
+fieldset {
+    padding: 15px;
+
+    margin-bottom: 10px;
+}
+
+input[type="number"]:focus {
+    background-color: rgba(51, 234, 206, 0.399);
+}
+
+p {
+    padding: 10px 0px;
+}
+
+footer {
+    text-align: center;
+    padding: 2px;
+}
+
+input[type="submit"] {
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid rgba(0, 0, 0, 0.479);
+}
