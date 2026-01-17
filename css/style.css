@@ -8,33 +8,53 @@
 
 body {
     padding: 10px;
+    background-color: beige;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
 }
-
-select {
-    width: 100%;
-}
-
 
 main {
     width: fit-content;
     margin: auto;
     padding: 5px;
-    background-color: rgba(128, 128, 128, 0.582);
+    background-color: rgba(128, 128, 128, 0.299);
+    border-radius: 8px;
+    box-shadow: 0px 0px 7px 1px rgba(0, 0, 0, 0.277);
 }
 
 h1 {
-    font-size: 1em;
+    color: rgba(0, 0, 0, 0.671);
+    font-size: 18px;
     text-align: center;
     padding: 4px 0px;
+    border-bottom: inset;
+    margin-bottom: 5px;
+}
+
+section {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+select {
+    border-radius: 5px;
+    font-weight: bold;
 }
 
 fieldset {
     padding: 15px;
-
+    border-color: rgba(0, 0, 0, 0.184);
     margin-bottom: 10px;
 }
 
-input[type="number"]:focus {
+legend {
+    font-weight: 600;
+    color: rgb(255, 255, 255);
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.504);
+    padding: 0px 25px 0px 5px;
+}
+
+input:focus {
     background-color: rgba(51, 234, 206, 0.399);
 }
 
