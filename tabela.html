@@ -14,6 +14,11 @@
 
         body {
             padding: 10px;
+            background-color: #ddd;
+        }
+
+        main {
+            width: fit-content;
         }
 
         table {
@@ -42,238 +47,349 @@
             height: 20px;
             border: 1px solid;
         }
+
+        /* Estilo para telas Mobile (menos de 768px) */
+        @media screen and (max-width: 768px) {
+            main {
+                margin: auto;
+            }
+            table {
+                display: block;
+                /* Transforma a tabela em um bloco empilhado */
+            }
+
+            thead {
+                display: none;
+                /* Esconde o cabeçalho complexo no mobile */
+            }
+
+            tr {
+                display: block;
+                border-bottom: 5px solid #ccc;
+                margin-bottom: 20px;
+                background: #f9f9f9;
+                padding: 10px;
+                border-radius: 8px;
+            }
+
+            td {
+                display: flex;
+                /* Alinha o nome da propriedade e o valor lado a lado */
+                justify-content: space-between;
+                border: none !important;
+                padding: 8px 5px !important;
+                text-align: left !important;
+                border-bottom: 1px solid #eee !important;
+            }
+
+            /* Usamos o data-label para mostrar o nome do campo no mobile */
+            td::before {
+                content: attr(data-label);
+                font-weight: bold;
+                color: #333;
+                margin-right: 10px;
+            }
+
+            /* Destaque para a linha de horário e nome */
+            tr[data-horario]::before {
+                content: "HORÁRIO: " attr(data-horario);
+                display: block;
+                font-weight: bold;
+                background: #004488;
+                color: white;
+                padding: 5px;
+                margin-bottom: 10px;
+                text-align: center;
+                border-radius: 4px;
+            }
+
+            td[colspan="5"],
+            td[colspan="14"],
+            td.rodape-mobile {
+                display: block !important;
+                /* Remove o flex lateral */
+                text-align: left !important;
+                padding: 15px !important;
+            }
+
+            /* Melhora o espaçamento dos checkboxes para o dedo do operador */
+            input[type="checkbox"] {
+                margin: 10px 5px 10px 15px;
+                transform: scale(1.3);
+                /* Aumenta um pouco para facilitar o clique */
+            }
+
+            /* Garante que os rótulos de Demanda e App fiquem em linhas separadas */
+            td span {
+                display: inline-block;
+                margin-bottom: 5px;
+            }
+
+            tfoot tr {
+                display: block !important;
+            }
+
+            tfoot td,
+            tfoot th {
+                display: block !important;
+                width: 100% !important;
+                text-align: left !important;
+                border: none !important;
+                border-bottom: 1px solid #ddd !important;
+                padding: 15px !important;
+            }
+
+            tfoot th {
+                background-color: #004488 !important;
+                color: white !important;
+                text-align: center !important;
+            }
+
+            /* Melhora o alinhamento dos checkboxes para não quebrarem linha estranho */
+            tfoot td br {
+                display: block;
+                content: "";
+                margin-top: 10px;
+            }
+
+            /* Remove o ::before (data-label) das células do rodapé para não duplicar informação */
+            tfoot td::before {
+                content: none !important;
+            }
+        }
     </style>
 </head>
 
 <body>
-    <table>
-        <thead>
-
-            <tr>
-                <th>
-                    <img id="logo" src="img/logo.png" alt="logo">
-                </th>
-                <th colspan="24">LEITURA DIÁRIA DE ROTINA DE CENTRIFUGAS</th>
-            </tr>
-
-            <tr>
-                <th>
-                    N° Chiller
-                </th>
-                <th colspan="10">
-                    ÁGUA
-                </th>
-                <th colspan="3" rowspan="2">LUBRIF</th>
-                <th colspan="4" rowspan="2">REFRIGERANTE</th>
-                <th colspan="7">ELÉTRICA</th>
-            </tr>
-            <tr>
-                <td id="chiller"></td>
-                <th colspan="4">GELADA</th>
-                <th>EVAPORAÇÃO</th>
-                <th colspan="5">CONDENSAÇÃO</th>
-                <th colspan="3">VOLTS</th>
-                <th colspan="3">AMPERES</th>
-                <th rowspan="4">% DEMANDA</th>
-            </tr>
-
-            <tr>
-                <th>UNIDADE</th>
-                <th>°C</th>
-                <th>°C</th>
-                <th>Kg/cm<sup>2</sup></th>
-                <th>Kg/cm<sup>2</sup></th>
-                <th>°C</th>
-                <th>°C</th>
-                <th>°C</th>
-                <th>°C</th>
-                <th>Kg/cm<sup>2</sup></th>
-                <th>Kg/cm<sup>2</sup></th>
-                <th>°C</th>
-                <th>KPA</th>
-                <th class="text-vertical">0,1/4,1/2 3/4 CH</th>
-                <th>KPA</th>
-                <th>KPA</th>
-                <th>°C</th>
-                <th>°C</th>
-                <th rowspan="3">AB<br>RS</th>
-                <th rowspan="3">AC<br>ST</th>
-                <th rowspan="3">BC<br>RT</th>
-                <th rowspan="3">A</th>
-                <th rowspan="3">B</th>
-                <th rowspan="3">C</th>
-            </tr>
-            <tr>
-                <th>VALOR NOMINAL</th>
-                <th rowspan="2" class="text-vertical">Temp. de<br>entrada</th>
-                <th rowspan="2" class="text-vertical">Temp. de<br>saída</th>
-                <th rowspan="2" class="text-vertical">Press. de <br>entrada</th>
-                <th rowspan="2" class="text-vertical">Press. de <br>saída</th>
-                <th rowspan="2" class="text-vertical">Delta de <br> temp <br> approach <br> (Evaporação)</th>
-                <th rowspan="2" class="text-vertical">Temp. de<br>entrada</th>
-                <th rowspan="2" class="text-vertical">Temp. de<br>saída</th>
-                <th rowspan="2" class="text-vertical">Delta de <br> temp <br> approach <br> (Evaporação)</th>
-                <th rowspan="2" class="text-vertical">Press. de <br>entrada</th>
-                <th rowspan="2" class="text-vertical">Press. de <br>saída</th>
-                <th rowspan="2" class="text-vertical">Temp. do<br>óleo</th>
-                <th rowspan="2" class="text-vertical">Press. <br>útil do óleo</th>
-                <th rowspan="2" class="text-vertical">Nível do <br> óleo do cárter</th>
-                <th rowspan="2" class="text-vertical">Press. de <br> evaporação</th>
-                <th rowspan="2" class="text-vertical">Press. de <br> condensação</th>
-                <th rowspan="2" class="text-vertical">Temp. de <br>evaporação</th>
-                <th rowspan="2" class="text-vertical">Temp. de <br>condensação</th>
-
-            </tr>
-
-            <tr>
-                <td><b>DATA:</b> <span id="data-tabela"></span></td>
-            </tr>
-            <tr data-horario="02:00">
-                <td>02:00</td>
-                <td rowspan="2" class="inTemp-entrada-GEL"></td>
-                <td rowspan="2" class="inTemp-saida-GEL"></td>
-                <td rowspan="2" class="inPress-entrada-GEL"></td>
-                <td rowspan="2" class="inPress-saida-GEL"></td>
-                <td rowspan="2" class="inDeltaEvap"></td>
-                <td rowspan="2" class="inTemp-entrada-CON"></td>
-                <td rowspan="2" class="inTemp-saida-CON"></td>
-                <td rowspan="2" class="inDeltaCond"></td>
-                <td rowspan="2" class="inPress-entrada-CON"></td>
-                <td rowspan="2" class="inPress-saida-CON"></td>
-                <td rowspan="2" class="inTempOleo"></td>
-                <td rowspan="2" class="inPress-util"></td>
-                <td rowspan="2" class="inNivel-oleo-carter"></td>
-                <td rowspan="2" class="inPress-evap"></td>
-                <td rowspan="2" class="inPress-cond"></td>
-                <td rowspan="2" class="inTemp-evap"></td>
-                <td rowspan="2" class="inTemp-cond"></td>
-                <td rowspan="2" class="inABRS"></td>
-                <td rowspan="2" class="inACST"></td>
-                <td rowspan="2" class="inBCRT"></td>
-                <td rowspan="2" class="inA"></td>
-                <td rowspan="2" class="inB"></td>
-                <td rowspan="2" class="inC"></td>
-                <td rowspan="2" class="inDemanda"></td>
-            </tr>
-            <tr>
-                <td class="nome"></td>
-            </tr>
-            <tr data-horario="08:00">
-                <td>08:00</td>
-                <td rowspan="2" class="inTemp-entrada-GEL"></td>
-                <td rowspan="2" class="inTemp-saida-GEL"></td>
-                <td rowspan="2" class="inPress-entrada-GEL"></td>
-                <td rowspan="2" class="inPress-saida-GEL"></td>
-                <td rowspan="2" class="inDeltaEvap"></td>
-                <td rowspan="2" class="inTemp-entrada-CON"></td>
-                <td rowspan="2" class="inTemp-saida-CON"></td>
-                <td rowspan="2" class="inDeltaCond"></td>
-                <td rowspan="2" class="inPress-entrada-CON"></td>
-                <td rowspan="2" class="inPress-saida-CON"></td>
-                <td rowspan="2" class="inTempOleo"></td>
-                <td rowspan="2" class="inPress-util"></td>
-                <td rowspan="2" class="inNivel-oleo-carter"></td>
-                <td rowspan="2" class="inPress-evap"></td>
-                <td rowspan="2" class="inPress-cond"></td>
-                <td rowspan="2" class="inTemp-evap"></td>
-                <td rowspan="2" class="inTemp-cond"></td>
-                <td rowspan="2" class="inABRS"></td>
-                <td rowspan="2" class="inACST"></td>
-                <td rowspan="2" class="inBCRT"></td>
-                <td rowspan="2" class="inA"></td>
-                <td rowspan="2" class="inB"></td>
-                <td rowspan="2" class="inC"></td>
-                <td rowspan="2" class="inDemanda"></td>
-            </tr>
-            <tr>
-                <td class="nome"></td>
-            </tr>
-            <tr data-horario="14:00">
-                <td>14:00</td>
-                <td rowspan="2" class="inTemp-entrada-GEL"></td>
-                <td rowspan="2" class="inTemp-saida-GEL"></td>
-                <td rowspan="2" class="inPress-entrada-GEL"></td>
-                <td rowspan="2" class="inPress-saida-GEL"></td>
-                <td rowspan="2" class="inDeltaEvap"></td>
-                <td rowspan="2" class="inTemp-entrada-CON"></td>
-                <td rowspan="2" class="inTemp-saida-CON"></td>
-                <td rowspan="2" class="inDeltaCond"></td>
-                <td rowspan="2" class="inPress-entrada-CON"></td>
-                <td rowspan="2" class="inPress-saida-CON"></td>
-                <td rowspan="2" class="inTempOleo"></td>
-                <td rowspan="2" class="inPress-util"></td>
-                <td rowspan="2" class="inNivel-oleo-carter"></td>
-                <td rowspan="2" class="inPress-evap"></td>
-                <td rowspan="2" class="inPress-cond"></td>
-                <td rowspan="2" class="inTemp-evap"></td>
-                <td rowspan="2" class="inTemp-cond"></td>
-                <td rowspan="2" class="inABRS"></td>
-                <td rowspan="2" class="inACST"></td>
-                <td rowspan="2" class="inBCRT"></td>
-                <td rowspan="2" class="inA"></td>
-                <td rowspan="2" class="inB"></td>
-                <td rowspan="2" class="inC"></td>
-                <td rowspan="2" class="inDemanda"></td>
-            </tr>
-            <tr>
-                <td class="nome"></td>
-            </tr>
-            <tr data-horario="20:00">
-                <td>20:00</td>
-                <td rowspan="2" class="inTemp-entrada-GEL"></td>
-                <td rowspan="2" class="inTemp-saida-GEL"></td>
-                <td rowspan="2" class="inPress-entrada-GEL"></td>
-                <td rowspan="2" class="inPress-saida-GEL"></td>
-                <td rowspan="2" class="inDeltaEvap"></td>
-                <td rowspan="2" class="inTemp-entrada-CON"></td>
-                <td rowspan="2" class="inTemp-saida-CON"></td>
-                <td rowspan="2" class="inDeltaCond"></td>
-                <td rowspan="2" class="inPress-entrada-CON"></td>
-                <td rowspan="2" class="inPress-saida-CON"></td>
-                <td rowspan="2" class="inTempOleo"></td>
-                <td rowspan="2" class="inPress-util"></td>
-                <td rowspan="2" class="inNivel-oleo-carter"></td>
-                <td rowspan="2" class="inPress-evap"></td>
-                <td rowspan="2" class="inPress-cond"></td>
-                <td rowspan="2" class="inTemp-evap"></td>
-                <td rowspan="2" class="inTemp-cond"></td>
-                <td rowspan="2" class="inABRS"></td>
-                <td rowspan="2" class="inACST"></td>
-                <td rowspan="2" class="inBCRT"></td>
-                <td rowspan="2" class="inA"></td>
-                <td rowspan="2" class="inB"></td>
-                <td rowspan="2" class="inC"></td>
-                <td rowspan="2" class="inDemanda"></td>
-            </tr>
-            <tr>
-                <td class="nome"></td>
-            </tr>
-            <tr>
-                <th rowspan="2">Ronda nas torres de resfriamento</th>
-            </tr>
-            <tr>
-                <td colspan="5">
-                    02:00 <input type="checkbox" class="check-ok-02:00"> Ok <input type="checkbox"
-                        class="check-nok-02:00"> NOk <br>
-                    08:00 <input type="checkbox" class="check-ok-08:00"> Ok <input type="checkbox"
-                        class="check-nok-08:00"> NOk <br>
-                    14:00 <input type="checkbox" class="check-ok-14:00"> Ok <input type="checkbox"
-                        class="check-nok-14:00"> NOk <br>
-                    20:00 <input type="checkbox" class="check-ok-20:00"> Ok <input type="checkbox"
-                        class="check-nok-20:00"> NOk
-                </td>
-                <td style="text-align: left;" colspan="5">
-                    DEMANDA % = <span></span> <br>
-                    APP EVAP = <span></span> <br>
-                    APP COND = <span></span>
-                </td>
-                <td style="text-align: left; line-height: 25px;" colspan="14">
-                    Operador 1° Turno: <span></span> <br>
-                    Operador 2° Turno: <span></span>
-                </td>
-            </tr>
-        </thead>
-    </table>
+    <main class="contain">
+        <table>
+            <thead>
+                <tr>
+                    <th>
+                        <img id="logo" src="img/logo.png" alt="logo">
+                    </th>
+                    <th colspan="24">LEITURA DIÁRIA DE ROTINA DE CENTRIFUGAS</th>
+                </tr>
+                <tr>
+                    <th>
+                        N° Chiller
+                    </th>
+                    <th colspan="10">
+                        ÁGUA
+                    </th>
+                    <th colspan="3" rowspan="2">LUBRIF</th>
+                    <th colspan="4" rowspan="2">REFRIGERANTE</th>
+                    <th colspan="7">ELÉTRICA</th>
+                </tr>
+                <tr>
+                    <td id="chiller"></td>
+                    <th colspan="4">GELADA</th>
+                    <th>EVAPORAÇÃO</th>
+                    <th colspan="5">CONDENSAÇÃO</th>
+                    <th colspan="3">VOLTS</th>
+                    <th colspan="3">AMPERES</th>
+                    <th rowspan="4">% DEMANDA</th>
+                </tr>
+                <tr>
+                    <th>UNIDADE</th>
+                    <th>°C</th>
+                    <th>°C</th>
+                    <th>Kg/cm<sup>2</sup></th>
+                    <th>Kg/cm<sup>2</sup></th>
+                    <th>°C</th>
+                    <th>°C</th>
+                    <th>°C</th>
+                    <th>°C</th>
+                    <th>Kg/cm<sup>2</sup></th>
+                    <th>Kg/cm<sup>2</sup></th>
+                    <th>°C</th>
+                    <th>KPA</th>
+                    <th class="text-vertical">0,1/4,1/2 3/4 CH</th>
+                    <th>KPA</th>
+                    <th>KPA</th>
+                    <th>°C</th>
+                    <th>°C</th>
+                    <th rowspan="3">AB<br>RS</th>
+                    <th rowspan="3">AC<br>ST</th>
+                    <th rowspan="3">BC<br>RT</th>
+                    <th rowspan="3">A</th>
+                    <th rowspan="3">B</th>
+                    <th rowspan="3">C</th>
+                </tr>
+                <tr>
+                    <th>VALOR NOMINAL</th>
+                    <th rowspan="2" class="text-vertical">Temp. de<br>entrada</th>
+                    <th rowspan="2" class="text-vertical">Temp. de<br>saída</th>
+                    <th rowspan="2" class="text-vertical">Press. de <br>entrada</th>
+                    <th rowspan="2" class="text-vertical">Press. de <br>saída</th>
+                    <th rowspan="2" class="text-vertical">Delta de <br> temp <br> approach <br> (Evaporação)</th>
+                    <th rowspan="2" class="text-vertical">Temp. de<br>entrada</th>
+                    <th rowspan="2" class="text-vertical">Temp. de<br>saída</th>
+                    <th rowspan="2" class="text-vertical">Delta de <br> temp <br> approach <br> (Evaporação)</th>
+                    <th rowspan="2" class="text-vertical">Press. de <br>entrada</th>
+                    <th rowspan="2" class="text-vertical">Press. de <br>saída</th>
+                    <th rowspan="2" class="text-vertical">Temp. do<br>óleo</th>
+                    <th rowspan="2" class="text-vertical">Press. <br>útil do óleo</th>
+                    <th rowspan="2" class="text-vertical">Nível do <br> óleo do cárter</th>
+                    <th rowspan="2" class="text-vertical">Press. de <br> evaporação</th>
+                    <th rowspan="2" class="text-vertical">Press. de <br> condensação</th>
+                    <th rowspan="2" class="text-vertical">Temp. de <br>evaporação</th>
+                    <th rowspan="2" class="text-vertical">Temp. de <br>condensação</th>
+                </tr>
+                <tr>
+                    <td><b>DATA:</b> <span id="data-tabela"></span></td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr data-horario="02:00">
+                    <td data-label="Horário">02:00</td>
+                    <td rowspan="2" class="inTemp-entrada-GEL" data-label="Temp. de Entrada Gelada"></td>
+                    <td rowspan="2" class="inTemp-saida-GEL" data-label="Temp. de Saída Gelada"></td>
+                    <td rowspan="2" class="inPress-entrada-GEL" data-label="Press. de Entrada Gelada"></td>
+                    <td rowspan="2" class="inPress-saida-GEL" data-label="Press. de Saída Gelada"></td>
+                    <td rowspan="2" class="inDeltaEvap" data-label="Delta de Temp. Evaporação"></td>
+                    <td rowspan="2" class="inTemp-entrada-CON" data-label="Temp. de Entrada Condensação"></td>
+                    <td rowspan="2" class="inTemp-saida-CON" data-label="Temp. de Saída Condensação"></td>
+                    <td rowspan="2" class="inDeltaCond" data-label="Delta de Temp. Evaporação"></td>
+                    <td rowspan="2" class="inPress-entrada-CON" data-label="Press. de Entrada Condensação"></td>
+                    <td rowspan="2" class="inPress-saida-CON" data-label="Press. de Saída Condensação"></td>
+                    <td rowspan="2" class="inTempOleo" data-label="Temp. do Óleo"></td>
+                    <td rowspan="2" class="inPress-util" data-label="Press. Útil do Óleo"></td>
+                    <td rowspan="2" class="inNivel-oleo-carter" data-label="Nível do Óleo do Cárter"></td>
+                    <td rowspan="2" class="inPress-evap" data-label="Press. de Evaporação"></td>
+                    <td rowspan="2" class="inPress-cond" data-label="Press. de Condensação"></td>
+                    <td rowspan="2" class="inTemp-evap" data-label="Temp. de Evaporação"></td>
+                    <td rowspan="2" class="inTemp-cond" data-label="Temp. de Evaporação de Condensação"></td>
+                    <td rowspan="2" class="inABRS" data-label="ABRS"></td>
+                    <td rowspan="2" class="inACST" data-label="ACST"></td>
+                    <td rowspan="2" class="inBCRT" data-label="BCRT"></td>
+                    <td rowspan="2" class="inA" data-label="A"></td>
+                    <td rowspan="2" class="inB" data-label="B"></td>
+                    <td rowspan="2" class="inC" data-label="C"></td>
+                    <td rowspan="2" class="inDemanda" data-label="% de Demanda"></td>
+                </tr>
+                <tr>
+                    <td class="nome"></td>
+                </tr>
+                <tr data-horario="08:00">
+                    <td data-label="Horário">08:00</td>
+                    <td rowspan="2" class="inTemp-entrada-GEL" data-label="Temp. de Entrada Gelada"></td>
+                    <td rowspan="2" class="inTemp-saida-GEL" data-label="Temp. de Saída Gelada"></td>
+                    <td rowspan="2" class="inPress-entrada-GEL" data-label="Press. de Entrada Gelada"></td>
+                    <td rowspan="2" class="inPress-saida-GEL" data-label="Press. de Saída Gelada"></td>
+                    <td rowspan="2" class="inDeltaEvap" data-label="Delta de Temp. Evaporação"></td>
+                    <td rowspan="2" class="inTemp-entrada-CON" data-label="Temp. de Entrada Condensação"></td>
+                    <td rowspan="2" class="inTemp-saida-CON" data-label="Temp. de Saída Condensação"></td>
+                    <td rowspan="2" class="inDeltaCond" data-label="Delta de Temp. Evaporação"></td>
+                    <td rowspan="2" class="inPress-entrada-CON" data-label="Press. de Entrada Condensação"></td>
+                    <td rowspan="2" class="inPress-saida-CON" data-label="Press. de Saída Condensação"></td>
+                    <td rowspan="2" class="inTempOleo" data-label="Temp. do Óleo"></td>
+                    <td rowspan="2" class="inPress-util" data-label="Press. Útil do Óleo"></td>
+                    <td rowspan="2" class="inNivel-oleo-carter" data-label="Nível do Óleo do Cárter"></td>
+                    <td rowspan="2" class="inPress-evap" data-label="Press. de Evaporação"></td>
+                    <td rowspan="2" class="inPress-cond" data-label="Press. de Condensação"></td>
+                    <td rowspan="2" class="inTemp-evap" data-label="Temp. de Evaporação"></td>
+                    <td rowspan="2" class="inTemp-cond" data-label="Temp. de Evaporação de Condensação"></td>
+                    <td rowspan="2" class="inABRS" data-label="ABRS"></td>
+                    <td rowspan="2" class="inACST" data-label="ACST"></td>
+                    <td rowspan="2" class="inBCRT" data-label="BCRT"></td>
+                    <td rowspan="2" class="inA" data-label="A"></td>
+                    <td rowspan="2" class="inB" data-label="B"></td>
+                    <td rowspan="2" class="inC" data-label="C"></td>
+                    <td rowspan="2" class="inDemanda" data-label="% de Demanda"></td>
+                </tr>
+                <tr>
+                    <td class="nome"></td>
+                </tr>
+                <tr data-horario="14:00">
+                    <td data-horario="Horário">14:00</td>
+                    <td rowspan="2" class="inTemp-entrada-GEL" data-label="Temp. de Entrada Gelada"></td>
+                    <td rowspan="2" class="inTemp-saida-GEL" data-label="Temp. de Saída Gelada"></td>
+                    <td rowspan="2" class="inPress-entrada-GEL" data-label="Press. de Entrada Gelada"></td>
+                    <td rowspan="2" class="inPress-saida-GEL" data-label="Press. de Saída Gelada"></td>
+                    <td rowspan="2" class="inDeltaEvap" data-label="Delta de Temp. Evaporação"></td>
+                    <td rowspan="2" class="inTemp-entrada-CON" data-label="Temp. de Entrada Condensação"></td>
+                    <td rowspan="2" class="inTemp-saida-CON" data-label="Temp. de Saída Condensação"></td>
+                    <td rowspan="2" class="inDeltaCond" data-label="Delta de Temp. Evaporação"></td>
+                    <td rowspan="2" class="inPress-entrada-CON" data-label="Press. de Entrada Condensação"></td>
+                    <td rowspan="2" class="inPress-saida-CON" data-label="Press. de Saída Condensação"></td>
+                    <td rowspan="2" class="inTempOleo" data-label="Temp. do Óleo"></td>
+                    <td rowspan="2" class="inPress-util" data-label="Press. Útil do Óleo"></td>
+                    <td rowspan="2" class="inNivel-oleo-carter" data-label="Nível do Óleo do Cárter"></td>
+                    <td rowspan="2" class="inPress-evap" data-label="Press. de Evaporação"></td>
+                    <td rowspan="2" class="inPress-cond" data-label="Press. de Condensação"></td>
+                    <td rowspan="2" class="inTemp-evap" data-label="Temp. de Evaporação"></td>
+                    <td rowspan="2" class="inTemp-cond" data-label="Temp. de Evaporação de Condensação"></td>
+                    <td rowspan="2" class="inABRS" data-label="ABRS"></td>
+                    <td rowspan="2" class="inACST" data-label="ACST"></td>
+                    <td rowspan="2" class="inBCRT" data-label="BCRT"></td>
+                    <td rowspan="2" class="inA" data-label="A"></td>
+                    <td rowspan="2" class="inB" data-label="B"></td>
+                    <td rowspan="2" class="inC" data-label="C"></td>
+                    <td rowspan="2" class="inDemanda" data-label="% de Demanda"></td>
+                </tr>
+                <tr>
+                    <td class="nome"></td>
+                </tr>
+                <tr data-horario="20:00">
+                    <td data-horario="Horário">20:00</td>
+                    <td rowspan="2" class="inTemp-entrada-GEL" data-label="Temp. de Entrada Gelada"></td>
+                    <td rowspan="2" class="inTemp-saida-GEL" data-label="Temp. de Saída Gelada"></td>
+                    <td rowspan="2" class="inPress-entrada-GEL" data-label="Press. de Entrada Gelada"></td>
+                    <td rowspan="2" class="inPress-saida-GEL" data-label="Press. de Saída Gelada"></td>
+                    <td rowspan="2" class="inDeltaEvap" data-label="Delta de Temp. Evaporação"></td>
+                    <td rowspan="2" class="inTemp-entrada-CON" data-label="Temp. de Entrada Condensação"></td>
+                    <td rowspan="2" class="inTemp-saida-CON" data-label="Temp. de Saída Condensação"></td>
+                    <td rowspan="2" class="inDeltaCond" data-label="Delta de Temp. Evaporação"></td>
+                    <td rowspan="2" class="inPress-entrada-CON" data-label="Press. de Entrada Condensação"></td>
+                    <td rowspan="2" class="inPress-saida-CON" data-label="Press. de Saída Condensação"></td>
+                    <td rowspan="2" class="inTempOleo" data-label="Temp. do Óleo"></td>
+                    <td rowspan="2" class="inPress-util" data-label="Press. Útil do Óleo"></td>
+                    <td rowspan="2" class="inNivel-oleo-carter" data-label="Nível do Óleo do Cárter"></td>
+                    <td rowspan="2" class="inPress-evap" data-label="Press. de Evaporação"></td>
+                    <td rowspan="2" class="inPress-cond" data-label="Press. de Condensação"></td>
+                    <td rowspan="2" class="inTemp-evap" data-label="Temp. de Evaporação"></td>
+                    <td rowspan="2" class="inTemp-cond" data-label="Temp. de Evaporação de Condensação"></td>
+                    <td rowspan="2" class="inABRS" data-label="ABRS"></td>
+                    <td rowspan="2" class="inACST" data-label="ACST"></td>
+                    <td rowspan="2" class="inBCRT" data-label="BCRT"></td>
+                    <td rowspan="2" class="inA" data-label="A"></td>
+                    <td rowspan="2" class="inB" data-label="B"></td>
+                    <td rowspan="2" class="inC" data-label="C"></td>
+                    <td rowspan="2" class="inDemanda" data-label="% de Demanda"></td>
+                </tr>
+                <tr>
+                    <td class="nome"></td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th rowspan="2">Ronda nas torres de resfriamento</th>
+                </tr>
+                <tr>
+                    <td colspan="5">
+                        02:00 <input type="checkbox" class="check-ok-02:00"> Ok <input type="checkbox"
+                            class="check-nok-02:00"> NOk <br>
+                        08:00 <input type="checkbox" class="check-ok-08:00"> Ok <input type="checkbox"
+                            class="check-nok-08:00"> NOk <br>
+                        14:00 <input type="checkbox" class="check-ok-14:00"> Ok <input type="checkbox"
+                            class="check-nok-14:00"> NOk <br>
+                        20:00 <input type="checkbox" class="check-ok-20:00"> Ok <input type="checkbox"
+                            class="check-nok-20:00"> NOk
+                    </td>
+                    <td style="text-align: left;" colspan="5">
+                        DEMANDA % = <span></span> <br>
+                        APP EVAP = <span></span> <br>
+                        APP COND = <span></span>
+                    </td>
+                    <td style="text-align: left; line-height: 25px;" colspan="14">
+                        Operador 1° Turno: <span></span> <br>
+                        Operador 2° Turno: <span></span>
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+    </main>
     <script src="js/script.js"></script>
 </body>
 
