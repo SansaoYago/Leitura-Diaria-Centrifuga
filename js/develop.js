@@ -5,7 +5,6 @@ const form = document.querySelector("form");
 if (form) {
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
-
         const botao = form.querySelector("input[type='submit']");
         botao.disabled = true;
         botao.value = "Salvando...";
@@ -13,7 +12,6 @@ if (form) {
         const dataHoje = new Date().toISOString().split('T')[0];
         const horaAtual = new Date().getHours();
         
-        // Regra de horários fixos baseada na hora atual
         let horarioAlvo = (horaAtual >= 0 && horaAtual < 6) ? "02:00" :
             (horaAtual >= 6 && horaAtual < 12) ? "08:00" :
             (horaAtual >= 12 && horaAtual < 18) ? "14:00" : "20:00";
@@ -50,17 +48,10 @@ if (form) {
             demanda: parseFloat(form["inDemanda"].value) || 0
         };
 
-        const { error } = await _supabase
-            .from('leituras_centrifugas')
-            .upsert(dadosLeitura);
-
-        if (error) {
-            alert("Erro ao salvar: " + error.message);
-        } else {
-            alert("Leitura registrada com sucesso!");
-            form.reset();
-        }
-
+        const { error } = await _supabase.from('leituras_centrifugas').upsert(dadosLeitura);
+        if (error) alert("Erro: " + error.message);
+        else { alert("Sucesso!"); form.reset(); }
+        
         botao.disabled = false;
         botao.value = "REGISTRAR";
     });
