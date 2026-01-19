@@ -14,10 +14,10 @@ async function carregarRelatorio() {
         const mes = String(dataAtual.getMonth() + 1).padStart(2, '0');
         const dia = String(dataAtual.getDate()).padStart(2, '0');
         const dataBusca = `${ano}-${mes}-${dia}`;
-        
+
         // Atualiza data na tabela
         document.getElementById("data-tabela").innerText = dataAtual.toLocaleDateString('pt-BR');
-        
+
         // Verifica parâmetro na URL
         const params = new URLSearchParams(window.location.search);
         const chillerParam = params.get('chiller');
@@ -50,7 +50,7 @@ async function carregarRelatorio() {
             limparTabela();
             mostrarAviso("Nenhum dado encontrado para o dia de hoje.");
         }
-        
+
     } catch (error) {
         console.error("💥 Erro ao carregar relatório:", error);
         mostrarErro("Erro inesperado ao carregar relatório.");
@@ -60,7 +60,7 @@ async function carregarRelatorio() {
 // Processa os dados
 function processarRelatorio(dados) {
     limparTabela();
-    
+
     let totalDemanda = 0;
     let totalEvap = 0;
     let totalCond = 0;
@@ -69,114 +69,144 @@ function processarRelatorio(dados) {
 
     dados.forEach(leitura => {
         const horario = leitura.horario;
+
+        // ENCONTRA A LINHA CORRETA (a que tem data-horario)
         const linha = document.querySelector(`tr[data-horario="${horario}"]`);
-        
-        if (!linha) return;
-        
+
+        if (!linha) {
+            console.warn(`Linha não encontrada para horário: ${horario}`);
+            return;
+        }
+
         console.log(`📝 Preenchendo linha ${horario}`);
-        
-        // Função auxiliar
-        const preencher = (classe, valor, formato = null, min = null, max = null) => {
+
+        // FUNÇÃO AUXILIAR ATUALIZADA
+        const preencher = (classe, valor, formato = null) => {
+            // Encontra o elemento na PRÓPRIA LINHA (não nos rowspan)
             const el = linha.querySelector(classe);
-            if (!el) return;
-            
-            let valorExibicao = "-";
-            let valorNum = null;
-            
-            // Tenta obter valor (compatibilidade com colunas antigas e novas)
-            let valorReal = valor;
-            if (valor === undefined || valor === null) {
-                // Tenta encontrar em outras propriedades
-                const campo = classe.replace('.', '');
-                if (campo.includes('ABRS')) valorReal = leitura.volts_abrs || leitura.v_abrs;
-                else if (campo.includes('ACST')) valorReal = leitura.volts_acst || leitura.v_acst;
-                else if (campo.includes('BCRT')) valorReal = leitura.volts_bcrt || leitura.v_bcrt;
-                else if (campo === 'inA') valorReal = leitura.amp_a || leitura.a_a;
-                else if (campo === 'inB') valorReal = leitura.amp_b || leitura.a_b;
-                else if (campo === 'inC') valorReal = leitura.amp_c || leitura.a_c;
+            if (!el) {
+                console.warn(`Elemento não encontrado: ${classe} no horário ${horario}`);
+                return;
             }
-            
-            if (valorReal !== null && valorReal !== undefined && valorReal !== "") {
-                valorNum = parseFloat(valorReal);
-                
+
+            let valorExibicao = "-";
+
+            if (valor !== null && valor !== undefined && valor !== "") {
+                const valorNum = parseFloat(valor);
+
                 if (!isNaN(valorNum)) {
-                    // Formata
+                    // Formatação
                     if (formato === 'decimal2') valorExibicao = valorNum.toFixed(2);
                     else if (formato === 'decimal1') valorExibicao = valorNum.toFixed(1);
                     else if (formato === 'decimal0') valorExibicao = Math.round(valorNum);
                     else valorExibicao = valorNum.toString();
-                    
-                    // Destaque se fora da faixa
-                    if (min !== null && valorNum < min) {
-                        el.style.backgroundColor = '#ffcccc';
-                        el.title = `Baixo (min: ${min})`;
-                    } else if (max !== null && valorNum > max) {
-                        el.style.backgroundColor = '#ffcccc';
-                        el.title = `Alto (max: ${max})`;
-                    } else {
-                        el.style.backgroundColor = '';
-                        el.title = '';
-                    }
                 } else {
-                    valorExibicao = valorReal;
+                    valorExibicao = valor; // Para campos de texto
                 }
             }
-            
+
             el.innerText = valorExibicao;
+            console.log(`✅ ${classe}: ${valorExibicao}`);
         };
 
-        // Preenche todos os campos
-        preencher(".inTemp-entrada-GEL", leitura.temp_entrada_gel, 'decimal1', 5, 15);
-        preencher(".inTemp-saida-GEL", leitura.temp_saida_gel, 'decimal1', 7, 20);
-        preencher(".inPress-entrada-GEL", leitura.press_entrada_gel, 'decimal2', 2, 8);
-        preencher(".inPress-saida-GEL", leitura.press_saida_gel, 'decimal2', 1, 7);
-        preencher(".inDeltaEvap", leitura.delta_evap, 'decimal1', 1, 10);
-        preencher(".inTemp-entrada-CON", leitura.temp_entrada_con, 'decimal1', 20, 40);
-        preencher(".inTemp-saida-CON", leitura.temp_saida_con, 'decimal1', 25, 45);
-        preencher(".inDeltaCond", leitura.delta_cond, 'decimal1', 1, 10);
-        preencher(".inPress-entrada-CON", leitura.press_entrada_con, 'decimal2', 0, 5);
-        preencher(".inPress-saida-CON", leitura.press_saida_con, 'decimal2', 0, 5);
-        preencher(".inTempOleo", leitura.temp_oleo, 'decimal1', 40, 80);
-        preencher(".inPress-util", leitura.press_util_oleo, 'decimal0', 100, 300);
-        preencher(".inNivel-oleo-carter", leitura.nivel_oleo);
-        preencher(".inPress-evap", leitura.press_evap, 'decimal0', 100, 600);
-        preencher(".inPress-cond", leitura.press_cond, 'decimal0', 200, 1000);
-        preencher(".inTemp-evap", leitura.temp_evap, 'decimal1', -10, 15);
-        preencher(".inTemp-cond", leitura.temp_cond, 'decimal1', 20, 60);
-        preencher(".inABRS", leitura.volts_abrs || leitura.v_abrs, 'decimal0', 380, 420);
-        preencher(".inACST", leitura.volts_acst || leitura.v_acst, 'decimal0', 380, 420);
-        preencher(".inBCRT", leitura.volts_bcrt || leitura.v_bcrt, 'decimal0', 380, 420);
-        preencher(".inA", leitura.amp_a || leitura.a_a, 'decimal1', 0, 150);
-        preencher(".inB", leitura.amp_b || leitura.a_b, 'decimal1', 0, 150);
-        preencher(".inC", leitura.amp_c || leitura.a_c, 'decimal1', 0, 150);
-        preencher(".inDemanda", leitura.demanda, 'decimal2', 0, 100);
+        // ===== PREENCHIMENTO DOS CAMPOS =====
+        // GELADA
+        preencher(".inTemp-entrada-GEL", leitura.temp_entrada_gel, 'decimal1');
+        preencher(".inTemp-saida-GEL", leitura.temp_saida_gel, 'decimal1');
+        preencher(".inPress-entrada-GEL", leitura.press_entrada_gel, 'decimal2');
+        preencher(".inPress-saida-GEL", leitura.press_saida_gel, 'decimal2');
 
-        // Nome do operador
-        const proximaLinha = linha.nextElementSibling;
-        if (proximaLinha) {
-            const nomeCell = proximaLinha.querySelector(".nome");
-            if (nomeCell) {
-                nomeCell.innerText = leitura.nome_operador || "-";
-                
-                if (leitura.nome_operador) {
-                    const hora = parseInt(horario.split(':')[0]);
-                    const turno = hora < 12 ? 'manha' : 'tarde';
-                    operadoresPorTurno[turno].add(leitura.nome_operador);
-                }
+        // EVAPORAÇÃO
+        preencher(".inDeltaEvap", leitura.delta_evap, 'decimal1');
+
+        // CONDENSAÇÃO
+        preencher(".inTemp-entrada-CON", leitura.temp_entrada_con, 'decimal1');
+        preencher(".inTemp-saida-CON", leitura.temp_saida_con, 'decimal1');
+        preencher(".inDeltaCond", leitura.delta_cond, 'decimal1');
+        preencher(".inPress-entrada-CON", leitura.press_entrada_con, 'decimal2');
+        preencher(".inPress-saida-CON", leitura.press_saida_con, 'decimal2');
+
+        // LUBRIFICAÇÃO
+        preencher(".inTempOleo", leitura.temp_oleo, 'decimal1');
+        preencher(".inPress-util", leitura.press_util_oleo, 'decimal0');
+        preencher(".inNivel-oleo-carter", leitura.nivel_oleo);
+
+        // REFRIGERANTE
+        preencher(".inPress-evap", leitura.press_evap, 'decimal0');
+        preencher(".inPress-cond", leitura.press_cond, 'decimal0');
+        preencher(".inTemp-evap", leitura.temp_evap, 'decimal1');
+        preencher(".inTemp-cond", leitura.temp_cond, 'decimal1');
+
+        // ELÉTRICA
+        preencher(".inABRS", leitura.volts_abrs || leitura.v_abrs, 'decimal0');
+        preencher(".inACST", leitura.volts_acst || leitura.v_acst, 'decimal0');
+        preencher(".inBCRT", leitura.volts_bcrt || leitura.v_bcrt, 'decimal0');
+        preencher(".inA", leitura.amp_a || leitura.a_a, 'decimal1');
+        preencher(".inB", leitura.amp_b || leitura.a_b, 'decimal1');
+        preencher(".inC", leitura.amp_c || leitura.a_c, 'decimal1');
+        preencher(".inDemanda", leitura.demanda, 'decimal2');
+
+        // ===== NOME DO OPERADOR (na linha seguinte) =====
+        const linhaNome = linha.nextElementSibling;
+        if (linhaNome && linhaNome.querySelector(".nome")) {
+            const nomeCell = linhaNome.querySelector(".nome");
+            nomeCell.innerText = leitura.nome_operador || "-";
+            console.log(`✅ Nome operador ${horario}: ${nomeCell.innerText}`);
+
+            if (leitura.nome_operador) {
+                const hora = parseInt(horario.split(':')[0]);
+                const turno = hora < 12 ? 'manha' : 'tarde';
+                operadoresPorTurno[turno].add(leitura.nome_operador);
             }
         }
-        
-        // Ronda
-        const rondaValue = leitura.ronda_status;
-        const isRondaOk = rondaValue === true || rondaValue === "true" || rondaValue === "ok" || rondaValue === "1";
-        
-        const checkboxOk = document.querySelector(`.check-ok-${horario}`);
-        const checkboxNok = document.querySelector(`.check-nok-${horario}`);
-        
-        if (checkboxOk) checkboxOk.checked = isRondaOk;
-        if (checkboxNok) checkboxNok.checked = !isRondaOk;
-        
-        // Acumula para médias
+
+        // ===== RONDA (CHECKBOXES) =====
+        // CORREÇÃO: Remova os dois pontos do horário para encontrar a classe
+        const horarioSemDoisPontos = horario.replace(':', ''); // "0200"
+
+        // Tenta os 3 formatos possíveis:
+        let checkboxOk = document.querySelector(`.check-ok-${horarioSemDoisPontos}`); // .check-ok-0200
+        let checkboxNok = document.querySelector(`.check-nok-${horarioSemDoisPontos}`); // .check-nok-0200
+
+        // Se não encontrou, tenta com dois pontos escapados
+        if (!checkboxOk || !checkboxNok) {
+            const horarioEscapado = '\\3A ' + horario.replace(':', ''); // Formato CSS escape
+            checkboxOk = checkboxOk || document.querySelector(`.check-ok-${horarioEscapado}`);
+            checkboxNok = checkboxNok || document.querySelector(`.check-nok-${horarioEscapado}`);
+        }
+
+        // Se ainda não encontrou, tenta buscar por data attributes
+        if (!checkboxOk || !checkboxNok) {
+            checkboxOk = checkboxOk || document.querySelector(`input[data-horario="${horario}"][data-tipo="ok"]`);
+            checkboxNok = checkboxNok || document.querySelector(`input[data-horario="${horario}"][data-tipo="nok"]`);
+        }
+
+        console.log(`🔍 Procurando checkboxes para ${horario}:`);
+        console.log(`   .check-ok-${horarioSemDoisPontos}:`, checkboxOk);
+        console.log(`   .check-nok-${horarioSemDoisPontos}:`, checkboxNok);
+
+        if (leitura.ronda_status !== undefined && leitura.ronda_status !== null) {
+            // Converte para booleano
+            const isRondaOk = leitura.ronda_status === true ||
+                leitura.ronda_status === "true" ||
+                leitura.ronda_status === "ok" ||
+                leitura.ronda_status === "1";
+
+            console.log(`✅ Ronda ${horario}: status=${leitura.ronda_status}, isOk=${isRondaOk}`);
+
+            if (checkboxOk) {
+                checkboxOk.checked = isRondaOk;
+                console.log(`   Checkbox OK marcado: ${isRondaOk}`);
+            }
+            if (checkboxNok) {
+                checkboxNok.checked = !isRondaOk;
+                console.log(`   Checkbox NOK marcado: ${!isRondaOk}`);
+            }
+        } else {
+            console.warn(`⚠️ Ronda ${horario}: status indefinido`);
+        }
+
+        // ===== ACUMULA PARA MÉDIAS =====
         if (leitura.demanda) {
             totalDemanda += parseFloat(leitura.demanda);
             totalEvap += leitura.delta_evap ? parseFloat(leitura.delta_evap) : 0;
@@ -185,21 +215,31 @@ function processarRelatorio(dados) {
         }
     });
 
-    // Calcula médias
+    // ===== CALCULA MÉDIAS =====
     if (contadorValidos > 0) {
-        document.getElementById("avg-demanda").innerText = (totalDemanda / contadorValidos).toFixed(2);
-        document.getElementById("avg-evap").innerText = (totalEvap / contadorValidos).toFixed(2);
-        document.getElementById("avg-cond").innerText = (totalCond / contadorValidos).toFixed(2);
+        const mediaDemanda = (totalDemanda / contadorValidos).toFixed(2);
+        const mediaEvap = (totalEvap / contadorValidos).toFixed(2);
+        const mediaCond = (totalCond / contadorValidos).toFixed(2);
+
+        document.getElementById("avg-demanda").innerText = mediaDemanda;
+        document.getElementById("avg-evap").innerText = mediaEvap;
+        document.getElementById("avg-cond").innerText = mediaCond;
+
+        console.log(`📊 Médias calculadas: Demanda=${mediaDemanda}%, Evap=${mediaEvap}, Cond=${mediaCond}`);
+    } else {
+        console.warn("⚠️ Nenhum dado válido para calcular médias");
     }
 
-    // Operadores por turno
-    document.getElementById("op-turno1").innerText = 
-        operadoresPorTurno.manha.size > 0 ? 
+    // ===== OPERADORES POR TURNO =====
+    const turno1 = operadoresPorTurno.manha.size > 0 ?
         Array.from(operadoresPorTurno.manha).join(', ') : "-";
-    
-    document.getElementById("op-turno2").innerText = 
-        operadoresPorTurno.tarde.size > 0 ? 
+    const turno2 = operadoresPorTurno.tarde.size > 0 ?
         Array.from(operadoresPorTurno.tarde).join(', ') : "-";
+
+    document.getElementById("op-turno1").innerText = turno1;
+    document.getElementById("op-turno2").innerText = turno2;
+
+    console.log(`👥 Operadores: Manhã=${turno1}, Tarde=${turno2}`);
 }
 
 // Limpa tabela
@@ -209,10 +249,10 @@ function limparTabela() {
         c.style.backgroundColor = '';
         c.title = '';
     });
-    
+
     document.querySelectorAll(".nome").forEach(c => c.innerText = "-");
     document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
-    
+
     document.getElementById("avg-demanda").innerText = "0.00";
     document.getElementById("avg-evap").innerText = "0.00";
     document.getElementById("avg-cond").innerText = "0.00";
@@ -224,7 +264,7 @@ function limparTabela() {
 
 function criarNavegacao() {
     const chillers = ['1.1', '1.2', '1.3', '2.1', '2.2', 'C1'];
-    
+
     const navegacao = document.createElement('div');
     navegacao.style.cssText = `
         background: #f5f5f5;
@@ -233,15 +273,15 @@ function criarNavegacao() {
         border-radius: 8px;
         box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     `;
-    
+
     navegacao.innerHTML = `
         <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
             <div>
                 <label style="font-weight: bold; margin-right: 10px;">Chiller:</label>
                 <select id="seletor-chiller" style="padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
-                    ${chillers.map(ch => 
-                        `<option value="${ch}" ${ch === chillerAtual ? 'selected' : ''}>CH${ch}</option>`
-                    ).join('')}
+                    ${chillers.map(ch =>
+        `<option value="${ch}" ${ch === chillerAtual ? 'selected' : ''}>CH${ch}</option>`
+    ).join('')}
                 </select>
             </div>
             
@@ -267,7 +307,7 @@ function criarNavegacao() {
             </div>
         </div>
     `;
-    
+
     document.querySelector('main').prepend(navegacao);
 }
 
@@ -305,10 +345,10 @@ function mostrarErro(mensagem) {
         font-weight: bold;
     `;
     erroDiv.textContent = mensagem;
-    
+
     const container = document.querySelector('.contain') || document.querySelector('main');
     container.prepend(erroDiv);
-    
+
     setTimeout(() => erroDiv.remove(), 5000);
 }
 
@@ -335,9 +375,9 @@ function configurarImpressao() {
                 <h2>RELATÓRIO DIÁRIO - CH${chillerAtual}</h2>
                 <p>Data: ${dataAtual.toLocaleDateString('pt-BR')} | Gerado em: ${new Date().toLocaleString('pt-BR')}</p>
             `;
-            
+
             document.body.prepend(header);
-            
+
             // CSS específico para impressão
             const style = document.createElement('style');
             style.textContent = `
@@ -351,9 +391,9 @@ function configurarImpressao() {
                 }
             `;
             document.head.appendChild(style);
-            
+
             window.print();
-            
+
             // Limpa após impressão
             setTimeout(() => {
                 header.remove();
@@ -369,7 +409,7 @@ document.addEventListener('DOMContentLoaded', () => {
     criarNavegacao();
     configurarImpressao();
     carregarRelatorio();
-    
+
     // Atualização automática a cada 5 minutos (opcional)
     // setInterval(carregarRelatorio, 300000);
 });
