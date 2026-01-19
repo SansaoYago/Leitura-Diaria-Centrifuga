@@ -14,7 +14,6 @@
 
         body {
             padding: 10px;
-            background-color: #ddd;
         }
 
         main {
@@ -53,6 +52,7 @@
             main {
                 margin: auto;
             }
+
             table {
                 display: block;
                 /* Transforma a tabela em um bloco empilhado */
@@ -155,6 +155,25 @@
             /* Remove o ::before (data-label) das células do rodapé para não duplicar informação */
             tfoot td::before {
                 content: none !important;
+            }
+
+            @media print {
+
+                .btn-print,
+                nav,
+                footer,
+                .no-print {
+                    display: none !important;
+                }
+
+                body {
+                    background: white;
+                }
+
+                .contain {
+                    width: 100%;
+                    margin: 0;
+                }
             }
         }
     </style>
@@ -383,14 +402,17 @@
                         APP COND = <span></span>
                     </td>
                     <td style="text-align: left; line-height: 25px;" colspan="14">
-                        Operador 1° Turno: <span></span> <br>
-                        Operador 2° Turno: <span></span>
+                        Operador 1° Turno: <span class="nome"></span> <br>
+                        Operador 2° Turno: <span class="nome"></span>
                     </td>
                 </tr>
             </tfoot>
         </table>
+        <button onclick="window.print()" class="btn-print">Gerar PDF / Imprimir</button>
     </main>
-    <script src="js/script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script src="js/develop.js"></script>
 </body>
 
 </html>
