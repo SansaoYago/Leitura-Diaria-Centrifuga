@@ -217,9 +217,14 @@ function processarRelatorio(dados) {
 
     // ===== CALCULA MÉDIAS =====
     if (contadorValidos > 0) {
-        const mediaDemanda = (totalDemanda / contadorValidos).toFixed(2);
         const mediaEvap = (totalEvap / contadorValidos).toFixed(2);
         const mediaCond = (totalCond / contadorValidos).toFixed(2);
+
+        let mediaDemanda = "0.00";
+        if (contadorValidos > 0) {
+            const mediaBase = totalDemanda / contadorValidos;
+            mediaDemanda = (mediaBase * 7).toFixed(2);
+        }
 
         document.getElementById("avg-demanda").innerText = mediaDemanda;
         document.getElementById("avg-evap").innerText = mediaEvap;
