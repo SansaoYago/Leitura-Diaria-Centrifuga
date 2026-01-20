@@ -138,12 +138,12 @@ function processarRelatorio(dados) {
         preencher(".inTemp-cond", leitura.temp_cond, 'decimal1');
 
         // ELÉTRICA
-        preencher(".inABRS", leitura.volts_abrs || leitura.v_abrs, 'decimal0');
-        preencher(".inACST", leitura.volts_acst || leitura.v_acst, 'decimal0');
-        preencher(".inBCRT", leitura.volts_bcrt || leitura.v_bcrt, 'decimal0');
-        preencher(".inA", leitura.amp_a || leitura.a_a, 'decimal1');
-        preencher(".inB", leitura.amp_b || leitura.a_b, 'decimal1');
-        preencher(".inC", leitura.amp_c || leitura.a_c, 'decimal1');
+        preencher(".inABRS", leitura.volts_abrs, 'decimal0');
+        preencher(".inACST", leitura.volts_acst, 'decimal0');
+        preencher(".inBCRT", leitura.volts_bcrt, 'decimal0');
+        preencher(".inA", leitura.amp_a, 'decimal1');
+        preencher(".inB", leitura.amp_b, 'decimal1');
+        preencher(".inC", leitura.amp_c, 'decimal1');
         preencher(".inDemanda", leitura.demanda, 'decimal2');
 
         // ===== NOME DO OPERADOR (na linha seguinte) =====

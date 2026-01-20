@@ -5,27 +5,12 @@ const form = document.querySelector("form");
 // Função de validação aprimorada
 function validarNumeroComAlerta(valor, campoNome, min, max, unidade = '') {
     if (valor === '' || valor === null || valor === undefined) {
-        return null;
+        return null; // Campos opcionais
     }
     
     const num = parseFloat(valor);
-    
     if (isNaN(num)) {
-        alert(`Por favor, insira um valor numérico válido para ${campoNome}`);
-        return null;
-    }
-    
-    // Verifica limites
-    if (num < min) {
-        if (!confirm(`⚠️ ATENÇÃO: ${campoNome} (${num}${unidade}) está abaixo do mínimo recomendado (${min}${unidade}). Deseja continuar?`)) {
-            return null;
-        }
-    }
-    
-    if (num > max) {
-        if (!confirm(`⚠️ ATENÇÃO: ${campoNome} (${num}${unidade}) está acima do máximo recomendado (${max}${unidade}). Deseja continuar?`)) {
-            return null;
-        }
+        return null; // Retorna null se não for número válido
     }
     
     return num;
@@ -56,11 +41,8 @@ if (form) {
                 throw new Error("Chiller não selecionado");
             }
             
+            // Ronda é OPCIONAL agora
             const rondaRadio = document.querySelector('input[name="ronda"]:checked');
-            if (!rondaRadio) {
-                alert("Por favor, informe o status da ronda na torre.");
-                throw new Error("Ronda não informada");
-            }
             
             // ===== PREPARAÇÃO DOS DADOS =====
             const dataHoje = new Date().toISOString().split('T')[0];
@@ -89,7 +71,7 @@ if (form) {
                 horario: horarioAlvo,
                 chiller: chiller,
                 nome_operador: nomeOperador,
-                ronda_status: rondaRadio.value === "ok",
+                ronda_status: rondaRadio ? (rondaRadio.value === "ok") : null,
                 
                 // Temperatura GELADA
                 temp_entrada_gel: tempEntradaGEL,
@@ -126,15 +108,7 @@ if (form) {
                 amp_b: validarNumeroComAlerta(form["inB"].value, 'Amperagem B', 0, 200, 'A'),
                 amp_c: validarNumeroComAlerta(form["inC"].value, 'Amperagem C', 0, 200, 'A'),
                 
-                demanda: validarNumeroComAlerta(form["inDemanda"].value, '% Demanda', 0, 100, '%'),
-                
-                // Mantém compatibilidade com colunas antigas
-                v_abrs: validarNumeroComAlerta(form["inABRS"].value, 'Voltagem ABRS', 0, 480, 'V'),
-                v_acst: validarNumeroComAlerta(form["inACST"].value, 'Voltagem ACST', 0, 480, 'V'),
-                v_bcrt: validarNumeroComAlerta(form["inBCRT"].value, 'Voltagem BCRT', 0, 480, 'V'),
-                a_a: validarNumeroComAlerta(form["inA"].value, 'Amperagem A', 0, 200, 'A'),
-                a_b: validarNumeroComAlerta(form["inB"].value, 'Amperagem B', 0, 200, 'A'),
-                a_c: validarNumeroComAlerta(form["inC"].value, 'Amperagem C', 0, 200, 'A')
+                demanda: validarNumeroComAlerta(form["inDemanda"].value, '% Demanda', 0, 100, '%')
             };
             
             // Remove valores nulos (campos não preenchidos)
@@ -147,19 +121,25 @@ if (form) {
             console.log("Dados a serem enviados:", dadosLeitura);
             
             // ===== VERIFICA DUPLICIDADE =====
-            const { data: leituraExistente } = await _supabase
-                .from('leituras_centrifugas')
-                .select('id')
-                .eq('data', dataHoje)
-                .eq('horario', horarioAlvo)
-                .eq('chiller', chiller)
-                .single();
-            
-            if (leituraExistente) {
-                const confirmar = confirm(`Já existe uma leitura para o chiller ${chiller} no horário ${horarioAlvo} de hoje. Deseja atualizar?`);
-                if (!confirmar) {
-                    throw new Error("Leitura duplicada - operação cancelada pelo usuário");
+            try {
+                const { data: leituraExistente } = await _supabase
+                    .from('leituras_centrifugas')
+                    .select('id')
+                    .eq('data', dataHoje)
+                    .eq('horario', horarioAlvo)
+                    .eq('chiller', chiller);
+                
+                if (leituraExistente && leituraExistente.length > 0) {
+                    const confirmar = confirm(`Já existe uma leitura para o chiller ${chiller} no horário ${horarioAlvo} de hoje. Deseja atualizar?`);
+                    if (!confirmar) {
+                        throw new Error("Leitura duplicada - operação cancelada pelo usuário");
+                    }
                 }
+            } catch (error) {
+                if (error.message && error.message.includes("duplicada")) {
+                    throw error;
+                }
+                console.warn("Aviso ao verificar duplicidade:", error);
             }
             
             // ===== ENVIO PARA SUPABASE =====
@@ -203,10 +183,10 @@ if (form) {
 // Configura navegação para relatório
 function configurarNavegacaoParaRelatorio() {
     const btnRelatorio = document.createElement('button');
-    btnRelatorio.textContent = '📊 Ver Relatório';
+    btnRelatorio.textContent = '📊';
     btnRelatorio.style.cssText = `
         position: fixed;
-        bottom: 20px;
+        bottom: 40px;
         right: 20px;
         padding: 10px 20px;
         background: #004488;
