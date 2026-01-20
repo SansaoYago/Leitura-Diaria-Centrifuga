@@ -314,6 +314,12 @@ function criarNavegacao() {
     `;
 
     document.querySelector('main').prepend(navegacao);
+    
+    // Adiciona o event listener após criar o seletor
+    const seletor = document.getElementById('seletor-chiller');
+    if (seletor) {
+        seletor.addEventListener('change', mudarChiller);
+    }
 }
 
 function mudarChiller() {
@@ -419,9 +425,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // setInterval(carregarRelatorio, 300000);
 });
 
-// Event listeners para navegação
-document.addEventListener('change', (e) => {
-    if (e.target.id === 'seletor-chiller') {
-        mudarChiller();
+// Clique direto no chiller na tabela para abrir seletor
+document.addEventListener('click', (e) => {
+    if (e.target.id === 'chiller') {
+        const seletor = document.getElementById('seletor-chiller');
+        if (seletor) {
+            seletor.focus();
+            seletor.click();
+        }
     }
 });
