@@ -2,6 +2,29 @@ const _supabase = supabase.createClient('https://hnkwtzygwyelfjvutakm.supabase.c
 
 const form = document.querySelector("form");
 
+// Função de validação de voltagem com alerta
+function validarVoltagem(valor, campoNome) {
+    if (valor === '' || valor === null || valor === undefined) {
+        return null;
+    }
+    
+    const num = parseFloat(valor);
+    if (isNaN(num)) {
+        return null;
+    }
+    
+    // Range esperado
+    const minEsperado = 432;
+    const maxEsperado = 528;
+    
+    // Se sair do range, mostra aviso mas permite continuar
+    if (num < minEsperado || num > maxEsperado) {
+        console.warn(`⚠️ ${campoNome}: ${num}V fora do range esperado (${minEsperado}-${maxEsperado}V). Possível anomalia no equipamento.`);
+    }
+    
+    return num;
+}
+
 // Função de validação aprimorada
 function validarNumeroComAlerta(valor, campoNome, min, max, unidade = '') {
     if (valor === '' || valor === null || valor === undefined) {
@@ -101,9 +124,9 @@ if (form) {
                 temp_cond: validarNumeroComAlerta(form["inTemp-cond"].value, 'Temp. Condensação', 0, 100, '°C'),
                 
                 // ELÉTRICA - USANDO OS NOVOS NOMES
-                volts_abrs: validarNumeroComAlerta(form["inABRS"].value, 'Voltagem ABRS', 0, 480, 'V'),
-                volts_acst: validarNumeroComAlerta(form["inACST"].value, 'Voltagem ACST', 0, 480, 'V'),
-                volts_bcrt: validarNumeroComAlerta(form["inBCRT"].value, 'Voltagem BCRT', 0, 480, 'V'),
+                volts_abrs: validarVoltagem(form["inABRS"].value, 'Voltagem ABRS'),
+                volts_acst: validarVoltagem(form["inACST"].value, 'Voltagem ACST'),
+                volts_bcrt: validarVoltagem(form["inBCRT"].value, 'Voltagem BCRT'),
                 amp_a: validarNumeroComAlerta(form["inA"].value, 'Amperagem A', 0, 200, 'A'),
                 amp_b: validarNumeroComAlerta(form["inB"].value, 'Amperagem B', 0, 200, 'A'),
                 amp_c: validarNumeroComAlerta(form["inC"].value, 'Amperagem C', 0, 200, 'A'),
