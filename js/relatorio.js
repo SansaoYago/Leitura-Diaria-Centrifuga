@@ -7,8 +7,50 @@ let dataAtual = new Date();
 // Função principal
 async function carregarRelatorio() {
     console.log("🚀 Iniciando busca de dados...");
+    console.log(`📌 Chiller atual antes de verificar: ${chillerAtual}`);
 
     try {
+        // Verifica parâmetro na URL
+        const params = new URLSearchParams(window.location.search);
+        const chillerParam = params.get('chiller');
+        
+        console.log(`🔍 Verificando URL...`);
+        console.log(`   - Parâmetro chiller na URL: ${chillerParam}`);
+        console.log(`   - chillerAtual: ${chillerAtual}`);
+        
+        if (chillerParam) {
+            chillerAtual = chillerParam;
+            console.log(`✅ Usando chiller da URL: ${chillerAtual}`);
+        } else {
+            // Se não encontrar na URL, tenta localStorage
+            const chillerLocal = localStorage.getItem('chillerAtual');
+            console.log(`   - localStorage chillerAtual: ${chillerLocal}`);
+            
+            if (chillerLocal) {
+                chillerAtual = chillerLocal;
+                console.log(`✅ Usando chiller do localStorage: ${chillerAtual}`);
+                
+                // Atualiza a URL com o valor do localStorage
+                const novaParams = new URLSearchParams(window.location.search);
+                novaParams.set('chiller', chillerAtual);
+                const novaURL = window.location.pathname + '?' + novaParams.toString();
+                window.history.replaceState({ chiller: chillerAtual }, '', novaURL);
+                console.log(`✅ URL atualizada com localStorage: ${novaURL}`);
+            } else {
+                console.log(`⚠️ Sem chiller na URL ou localStorage, usando padrão: ${chillerAtual}`);
+            }
+        }
+        
+        // Atualiza o seletor se existir
+        const seletor = document.getElementById('seletor-chiller');
+        if (seletor) {
+            seletor.value = chillerAtual;
+            console.log(`✅ Seletor atualizado para: ${chillerAtual}`);
+        }
+        
+        document.getElementById("chiller").innerText = chillerAtual;
+        console.log(`✅ Display de chiller atualizado: ${chillerAtual}`);
+
         // Formata data
         const ano = dataAtual.getFullYear();
         const mes = String(dataAtual.getMonth() + 1).padStart(2, '0');
@@ -17,14 +59,6 @@ async function carregarRelatorio() {
 
         // Atualiza data na tabela
         document.getElementById("data-tabela").innerText = dataAtual.toLocaleDateString('pt-BR');
-
-        // Verifica parâmetro na URL
-        const params = new URLSearchParams(window.location.search);
-        const chillerParam = params.get('chiller');
-        if (chillerParam) {
-            chillerAtual = chillerParam;
-            document.getElementById("chiller").innerText = chillerParam;
-        }
 
         console.log(`🔍 Buscando: Data=${dataBusca} | Chiller=${chillerAtual}`);
 
@@ -42,13 +76,13 @@ async function carregarRelatorio() {
             return;
         }
 
-        console.log(`✅ ${data?.length || 0} registros encontrados`);
+        console.log(`✅ ${data?.length || 0} registros encontrados para Chiller ${chillerAtual}`);
 
         if (data && data.length > 0) {
             processarRelatorio(data);
         } else {
             limparTabela();
-            mostrarAviso("Nenhum dado encontrado para o dia de hoje.");
+            mostrarAviso(`Nenhum dado encontrado para o chiller ${chillerAtual} no dia de hoje.`);
         }
 
     } catch (error) {
@@ -303,7 +337,7 @@ function criarNavegacao() {
             </div>
             
             <div style="margin-left: auto;">
-                <button onclick="carregarRelatorio()" style="padding: 10px 20px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">
+                <button id="btn-atualizar" onclick="atualizarComEmergencia()" style="padding: 10px 20px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">
                     🔄 Atualizar
                 </button>
                 <button onclick="window.location.href='index.html'" style="margin-left: 10px; padding: 10px 20px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer;">
@@ -322,11 +356,72 @@ function criarNavegacao() {
     }
 }
 
+// ===== FUNÇÃO DE EMERGÊNCIA - ATUALIZAR =====
+function atualizarComEmergencia() {
+    console.log("🚨 BOTÃO ATUALIZAR ACIONADO - MODO EMERGÊNCIA");
+    
+    // Passo 1: Lê o chiller selecionado no dropdown
+    const seletor = document.getElementById('seletor-chiller');
+    if (!seletor) {
+        console.error("❌ Seletor de chiller não encontrado!");
+        mostrarErro("Erro: Seletor de chiller não disponível");
+        return;
+    }
+    
+    const chillerSelecionado = seletor.value;
+    console.log(`✅ Chiller selecionado no dropdown: ${chillerSelecionado}`);
+    
+    // Passo 2: Força o chiller atual
+    chillerAtual = chillerSelecionado;
+    
+    // Passo 3: Atualiza a URL
+    const params = new URLSearchParams(window.location.search);
+    params.set('chiller', chillerAtual);
+    const novaURL = window.location.pathname + '?' + params.toString();
+    window.history.replaceState({ chiller: chillerAtual }, '', novaURL);
+    console.log(`✅ URL atualizada: ${novaURL}`);
+    
+    // Passo 4: Atualiza localStorage
+    localStorage.setItem('chillerAtual', chillerAtual);
+    console.log(`✅ localStorage atualizado: chillerAtual=${chillerAtual}`);
+    
+    // Passo 5: Atualiza o display do chiller na tabela
+    document.getElementById("chiller").innerText = chillerAtual;
+    console.log(`✅ Display do chiller atualizado: ${chillerAtual}`);
+    
+    // Passo 6: Efeito visual no botão
+    const btnAtualizar = document.getElementById('btn-atualizar');
+    const corOriginal = btnAtualizar.style.background;
+    btnAtualizar.style.background = '#ff6b6b';
+    setTimeout(() => {
+        btnAtualizar.style.background = corOriginal;
+    }, 500);
+    
+    console.log(`🔄 Iniciando carregamento do relatório...`);
+    
+    // Passo 7: Carrega o relatório
+    carregarRelatorio();
+}
+
 function mudarChiller() {
     const seletor = document.getElementById('seletor-chiller');
     if (seletor) {
         chillerAtual = seletor.value;
+        console.log(`✨ Chiller mudado para: ${chillerAtual}`);
+        
         document.getElementById("chiller").innerText = chillerAtual;
+        
+        // Atualiza a URL com o novo chiller
+        const params = new URLSearchParams(window.location.search);
+        params.set('chiller', chillerAtual);
+        const novaURL = window.location.pathname + '?' + params.toString();
+        window.history.pushState({ chiller: chillerAtual }, '', novaURL);
+        console.log(`✅ URL atualizada: ${novaURL}`);
+        
+        // Salva em localStorage como backup
+        localStorage.setItem('chillerAtual', chillerAtual);
+        console.log(`✅ localStorage atualizado: ${chillerAtual}`);
+        
         carregarRelatorio();
     }
 }
@@ -433,5 +528,18 @@ document.addEventListener('click', (e) => {
             seletor.focus();
             seletor.click();
         }
+    }
+});
+
+// Listener para botões de navegação do navegador
+window.addEventListener('popstate', (e) => {
+    if (e.state && e.state.chiller) {
+        chillerAtual = e.state.chiller;
+        const seletor = document.getElementById('seletor-chiller');
+        if (seletor) {
+            seletor.value = chillerAtual;
+        }
+        document.getElementById("chiller").innerText = chillerAtual;
+        carregarRelatorio();
     }
 });
