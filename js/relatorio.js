@@ -420,7 +420,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Event listeners para navegação
-document.addEventListener('click', (e) => {
+document.addEventListener('change', (e) => {
     if (e.target.id === 'seletor-chiller') {
         mudarChiller();
     }
