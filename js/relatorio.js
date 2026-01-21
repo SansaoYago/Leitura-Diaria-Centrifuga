@@ -305,6 +305,7 @@ function criarNavegacao() {
     const chillers = ['1.1', '1.2', '1.3', '2.1', '2.2', 'C1'];
 
     const navegacao = document.createElement('div');
+    navegacao.className = 'no-print';
     navegacao.style.cssText = `
         background: #f5f5f5;
         padding: 15px;
@@ -489,7 +490,7 @@ function configurarImpressao() {
             style.textContent = `
                 @media print {
                     .print-header { display: block !important; }
-                    .btn-print, nav, footer { display: none !important; }
+                    .btn-print, .no-print, nav, footer { display: none !important; }
                     body { background: white !important; }
                     table { width: 100%; border-collapse: collapse; }
                     td, th { border: 1px solid #000 !important; padding: 5px !important; }
