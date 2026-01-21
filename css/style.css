@@ -73,3 +73,15 @@ input[type="submit"] {
     border-radius: 5px;
     border: 1px solid rgba(0, 0, 0, 0.479);
 }
+
+/* No computador, mostramos o texto completo */
+.btn-responsivo::after {
+    content: " Gerar Relatório";
+}
+
+/* No celular, escondemos o texto e deixamos só o ícone */
+@media (max-width: 768px) {
+    .btn-responsivo::after {
+        content: ""; 
+    }
+}
