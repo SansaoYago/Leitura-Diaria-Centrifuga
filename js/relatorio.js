@@ -57,6 +57,12 @@ async function carregarRelatorio() {
         const dia = String(dataAtual.getDate()).padStart(2, '0');
         const dataBusca = `${ano}-${mes}-${dia}`;
 
+        // Sincroniza seletor de data no painel de controle
+        const inputData = document.getElementById("seletor-data");
+        if (inputData && inputData.value !== dataBusca) {
+            inputData.value = dataBusca;
+        }
+
         // Atualiza data na tabela
         document.getElementById("data-tabela").innerText = dataAtual.toLocaleDateString('pt-BR');
 
@@ -313,61 +319,104 @@ function limparTabela() {
     document.getElementById("op-turno2").innerText = "-";
 }
 
-// ===== FUNÇÕES DE NAVEGAÇÃO =====
+// ===== FUNÇÕES DE NAVEGAÇÃO & CONTROLES =====
+
+function formatarDataISO(data = new Date()) {
+    const ano = data.getFullYear();
+    const mes = String(data.getMonth() + 1).padStart(2, '0');
+    const dia = String(data.getDate()).padStart(2, '0');
+    return `${ano}-${mes}-${dia}`;
+}
 
 function criarNavegacao() {
+    // Remove painel anterior se houver
+    const painelAntigo = document.querySelector('.painel-topo');
+    if (painelAntigo) {
+        painelAntigo.remove();
+    }
+
     const chillers = ['1.1', '1.2', '1.3', '2.1', '2.2', 'C1'];
+    const dataISO = formatarDataISO(dataAtual);
 
-    const navegacao = document.createElement('div');
-    navegacao.className = 'no-print';
-    navegacao.style.cssText = `
-        background: #f5f5f5;
-        padding: 15px;
-        margin-bottom: 20px;
-        border-radius: 8px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    `;
+    const painel = document.createElement('div');
+    painel.className = 'painel-topo no-print';
 
-    navegacao.innerHTML = `
-        <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
-            <div>
-                <label style="font-weight: bold; margin-right: 10px;">Chiller:</label>
-                <select id="seletor-chiller" style="padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
+    painel.innerHTML = `
+        <div class="grupo-controles">
+            <div class="campo-item">
+                <label for="seletor-chiller">Chiller:</label>
+                <select id="seletor-chiller">
                     ${chillers.map(ch =>
-        `<option value="${ch}" ${ch === chillerAtual ? 'selected' : ''}>CH${ch}</option>`
-    ).join('')}
+                        `<option value="${ch}" ${ch === chillerAtual ? 'selected' : ''}>CH ${ch}</option>`
+                    ).join('')}
                 </select>
             </div>
             
-            <div style="margin-left: 20px;">
-                <label style="font-weight: bold; margin-right: 10px;">Data:</label>
-                <button onclick="mudarData(-1)" style="padding: 8px 15px; border: 1px solid #ccc; background: white; cursor: pointer;">◀</button>
-                <span id="data-exibicao" style="margin: 0 15px; font-weight: bold; min-width: 120px; display: inline-block;">
-                    ${dataAtual.toLocaleDateString('pt-BR')}
-                </span>
-                <button onclick="mudarData(1)" style="padding: 8px 15px; border: 1px solid #ccc; background: white; cursor: pointer;">▶</button>
-                <button onclick="hoje()" style="margin-left: 10px; padding: 8px 15px; background: #004488; color: white; border: none; border-radius: 4px; cursor: pointer;">
+            <div class="campo-item">
+                <label for="seletor-data">📅 Data:</label>
+                <input type="date" id="seletor-data" value="${dataISO}">
+                <button type="button" id="btn-hoje" class="btn-ctrl btn-ctrl-hoje" title="Ir para data de hoje">
                     Hoje
                 </button>
             </div>
-            
-            <div style="margin-left: auto;">
-                <button id="btn-atualizar" onclick="atualizarComEmergencia()" style="padding: 10px 20px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">
-                    🔄 Atualizar
-                </button>
-                <button onclick="window.location.href='index.html'" style="margin-left: 10px; padding: 10px 20px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer;">
-                    📝 Nova Leitura
-                </button>
-            </div>
+        </div>
+
+        <div class="grupo-botoes">
+            <button type="button" id="btn-imprimir-topo" class="btn-ctrl btn-ctrl-pdf" title="Gerar PDF ou Imprimir em Formato A4 Paisagem">
+                📄 Gerar PDF / Imprimir
+            </button>
+            <button type="button" id="btn-atualizar" class="btn-ctrl btn-ctrl-atualizar" title="Recarregar relatório">
+                🔄 Atualizar
+            </button>
+            <button type="button" onclick="window.location.href='index.html'" class="btn-ctrl btn-ctrl-novo" title="Preencher nova leitura">
+                📝 Nova Leitura
+            </button>
         </div>
     `;
 
-    document.querySelector('main').prepend(navegacao);
+    document.querySelector('main').prepend(painel);
     
-    // Adiciona o event listener após criar o seletor
-    const seletor = document.getElementById('seletor-chiller');
-    if (seletor) {
-        seletor.addEventListener('change', mudarChiller);
+    // Listeners dos controles
+    const seletorChiller = document.getElementById('seletor-chiller');
+    if (seletorChiller) {
+        seletorChiller.addEventListener('change', mudarChiller);
+    }
+
+    const seletorData = document.getElementById('seletor-data');
+    if (seletorData) {
+        seletorData.addEventListener('change', (e) => {
+            if (!e.target.value) return;
+            const partes = e.target.value.split('-');
+            if (partes.length === 3) {
+                const ano = parseInt(partes[0], 10);
+                const mes = parseInt(partes[1], 10) - 1;
+                const dia = parseInt(partes[2], 10);
+                // Define data no meio-dia local para evitar qualquer desvio de timezone
+                dataAtual = new Date(ano, mes, dia, 12, 0, 0);
+                console.log(`📅 Data selecionada no calendário: ${dataAtual.toLocaleDateString('pt-BR')}`);
+                carregarRelatorio();
+            }
+        });
+    }
+
+    const btnHoje = document.getElementById('btn-hoje');
+    if (btnHoje) {
+        btnHoje.addEventListener('click', () => {
+            dataAtual = new Date();
+            const inputData = document.getElementById('seletor-data');
+            if (inputData) inputData.value = formatarDataISO(dataAtual);
+            carregarRelatorio();
+        });
+    }
+
+    const btnAtualizar = document.getElementById('btn-atualizar');
+    if (btnAtualizar) {
+        btnAtualizar.addEventListener('click', atualizarComEmergencia);
+    }
+
+    const btnImprimir = document.getElementById('btn-imprimir-topo');
+    if (btnImprimir) {
+        btnImprimir.addEventListener('click', executarImpressao);
     }
 }
 
@@ -477,50 +526,31 @@ function mostrarAviso(mensagem) {
     console.warn(mensagem);
 }
 
-// Configura impressão
+// Função centralizada para executar a impressão em formato A4 Paisagem
+function executarImpressao() {
+    let header = document.querySelector('.print-header');
+    if (!header) {
+        header = document.createElement('div');
+        header.className = 'print-header';
+        document.body.prepend(header);
+    }
+    header.innerHTML = `
+        <h2>RELATÓRIO DIÁRIO - CH${chillerAtual}</h2>
+        <p>Data: ${dataAtual.toLocaleDateString('pt-BR')} | Gerado em: ${new Date().toLocaleString('pt-BR')}</p>
+    `;
+
+    window.print();
+}
+
+// Configura botões de impressão
 function configurarImpressao() {
+    const btnTopo = document.getElementById('btn-imprimir-topo');
+    if (btnTopo) {
+        btnTopo.onclick = executarImpressao;
+    }
     const btnPrint = document.querySelector('.btn-print');
     if (btnPrint) {
-        btnPrint.onclick = () => {
-            // Adiciona cabeçalho para impressão
-            const header = document.createElement('div');
-            header.className = 'print-header';
-            header.style.cssText = `
-                text-align: center;
-                margin-bottom: 20px;
-                padding-bottom: 10px;
-                border-bottom: 2px solid #000;
-                display: none;
-            `;
-            header.innerHTML = `
-                <h2>RELATÓRIO DIÁRIO - CH${chillerAtual}</h2>
-                <p>Data: ${dataAtual.toLocaleDateString('pt-BR')} | Gerado em: ${new Date().toLocaleString('pt-BR')}</p>
-            `;
-
-            document.body.prepend(header);
-
-            // CSS específico para impressão
-            const style = document.createElement('style');
-            style.textContent = `
-                @media print {
-                    .print-header { display: block !important; }
-                    .btn-print, .no-print, nav, footer { display: none !important; }
-                    body { background: white !important; }
-                    table { width: 100%; border-collapse: collapse; }
-                    td, th { border: 1px solid #000 !important; padding: 5px !important; }
-                    .text-vertical { writing-mode: vertical-rl; }
-                }
-            `;
-            document.head.appendChild(style);
-
-            window.print();
-
-            // Limpa após impressão
-            setTimeout(() => {
-                header.remove();
-                style.remove();
-            }, 100);
-        };
+        btnPrint.onclick = executarImpressao;
     }
 }
 
@@ -565,3 +595,5 @@ window.hoje = hoje;
 window.atualizarComEmergencia = atualizarComEmergencia;
 window.mudarChiller = mudarChiller;
 window.carregarRelatorio = carregarRelatorio;
+window.executarImpressao = executarImpressao;
+

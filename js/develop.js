@@ -134,8 +134,15 @@ if (form) {
                 throw new Error("Chiller não selecionado");
             }
 
-            // Ronda é OPCIONAL
+            // Ronda é OBRIGATÓRIA
             const rondaRadio = document.querySelector('input[name="ronda"]:checked');
+            if (!rondaRadio) {
+                exibirMensagem("Por favor, selecione se a ronda nas torres foi Realizada ou Não Realizada.", "erro");
+                try { alert("Por favor, selecione se a ronda nas torres foi Realizada ou Não Realizada."); } catch(e) {}
+                const rondaEl = document.getElementById("inRondaOk");
+                if (rondaEl) rondaEl.focus();
+                throw new Error("Ronda não selecionada");
+            }
 
             // ===== PREPARAÇÃO DOS DADOS COM DATA LOCAL CORRETA =====
             const dataHoje = formatarDataLocal(new Date());

@@ -173,22 +173,254 @@
             tfoot td::before {
                 content: none !important;
             }
+        }
 
-            @media print {
-                nav,
-                footer,
-                .no-print {
-                    display: none !important;
-                }
+        /* Painel de Controle Superior (Navegação + Calendário + Ações) */
+        .painel-topo {
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-top: 4px solid #0d1b4a;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            font-family: inherit;
+        }
 
-                body {
-                    background: white;
-                }
+        .painel-topo .grupo-controles {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 16px;
+        }
 
-                .contain {
-                    width: 100%;
-                    margin: 0;
-                }
+        .painel-topo .campo-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .painel-topo label {
+            font-size: 13px;
+            font-weight: 700;
+            color: #0d1b4a;
+        }
+
+        .painel-topo select,
+        .painel-topo input[type="date"] {
+            height: 38px;
+            padding: 4px 10px;
+            border: 1px solid #94a3b8;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #0f172a;
+            background: #f8fafc;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+
+        .painel-topo select:focus,
+        .painel-topo input[type="date"]:focus {
+            border-color: #152b6d;
+            box-shadow: 0 0 0 2px rgba(21, 43, 109, 0.2);
+            background: #ffffff;
+        }
+
+        .painel-topo .grupo-botoes {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-ctrl {
+            height: 38px;
+            padding: 0 16px;
+            border-radius: 6px;
+            border: none;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-ctrl:active {
+            transform: scale(0.98);
+        }
+
+        .btn-ctrl-pdf {
+            background: linear-gradient(135deg, #e20612, #b5050e);
+            color: #ffffff;
+        }
+
+        .btn-ctrl-pdf:hover {
+            background: linear-gradient(135deg, #b5050e, #8f030a);
+            box-shadow: 0 3px 10px rgba(226, 6, 18, 0.35);
+        }
+
+        .btn-ctrl-hoje {
+            background: #f1f5f9;
+            color: #1e293b;
+            border: 1px solid #cbd5e1;
+            padding: 0 12px;
+        }
+
+        .btn-ctrl-hoje:hover {
+            background: #e2e8f0;
+        }
+
+        .btn-ctrl-atualizar {
+            background: linear-gradient(135deg, #152b6d, #0d1b4a);
+            color: #ffffff;
+        }
+
+        .btn-ctrl-atualizar:hover {
+            background: linear-gradient(135deg, #0d1b4a, #060e28);
+            box-shadow: 0 3px 10px rgba(13, 27, 74, 0.35);
+        }
+
+        .btn-ctrl-novo {
+            background: #475569;
+            color: #ffffff;
+        }
+
+        .btn-ctrl-novo:hover {
+            background: #334155;
+        }
+
+        /* REGRAS DE IMPRESSÃO (PDF PAISAGEM A4 100% AJUSTADO SEM CORTAR BORDAS) */
+        @page {
+            size: A4 landscape;
+            margin: 4mm 5mm 4mm 5mm;
+        }
+
+        @media print {
+            *, *::before, *::after {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                box-sizing: border-box !important;
+            }
+
+            html, body {
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                background: #ffffff !important;
+                font-family: Arial, Helvetica, sans-serif !important;
+                color: #000000 !important;
+            }
+
+            .no-print, .btn-print, .painel-topo, nav, footer, #app-toast {
+                display: none !important;
+            }
+
+            .print-header {
+                display: block !important;
+                text-align: center;
+                margin: 0 0 6px 0 !important;
+                padding: 0 0 4px 0 !important;
+                border-bottom: 1.5px solid #000000 !important;
+            }
+
+            .print-header h2 {
+                font-size: 13pt !important;
+                margin: 0 0 2px 0 !important;
+                font-weight: 700 !important;
+                color: #000000 !important;
+            }
+
+            .print-header p {
+                font-size: 7.5pt !important;
+                margin: 0 !important;
+                color: #333333 !important;
+            }
+
+            main, .contain {
+                width: 100% !important;
+                max-width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                display: block !important;
+            }
+
+            table {
+                width: 100% !important;
+                max-width: 100% !important;
+                table-layout: fixed !important;
+                border-collapse: collapse !important;
+                display: table !important;
+                margin: 0 auto !important;
+                page-break-inside: avoid !important;
+            }
+
+            thead {
+                display: table-header-group !important;
+            }
+
+            tbody {
+                display: table-row-group !important;
+            }
+
+            tfoot {
+                display: table-footer-group !important;
+            }
+
+            tr {
+                display: table-row !important;
+                page-break-inside: avoid !important;
+                background: transparent !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                border: none !important;
+            }
+
+            th, td {
+                display: table-cell !important;
+                border: 1px solid #000000 !important;
+                padding: 2px 0.5px !important;
+                text-align: center !important;
+                font-size: 6.8pt !important;
+                line-height: 1.15 !important;
+                overflow: hidden !important;
+                word-break: break-word !important;
+                background: transparent !important;
+            }
+
+            #logo {
+                max-width: 58px !important;
+                max-height: 28px !important;
+                object-fit: contain !important;
+            }
+
+            .text-vertical {
+                writing-mode: vertical-rl !important;
+                transform: rotate(180deg) !important;
+                font-size: 6.2pt !important;
+                white-space: nowrap !important;
+                padding: 2px 0 !important;
+            }
+
+            input[type="checkbox"] {
+                margin: 0 1px !important;
+                transform: scale(0.8) !important;
+                vertical-align: middle !important;
+            }
+
+            tfoot td, tfoot th {
+                font-size: 6.8pt !important;
+                padding: 3px 4px !important;
+                text-align: left !important;
             }
         }
     </style>
@@ -423,7 +655,6 @@
                 </tr>
             </tfoot>
         </table>
-        <button onclick="window.print()" class="btn-print">Gerar PDF / Imprimir</button>
     </main>
     <script type="module" src="js/relatorio.js"></script>
 </body>
