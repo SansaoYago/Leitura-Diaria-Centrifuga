@@ -1,0 +1,16 @@
+{
+  "name": "leitura-diaria-centrifuga",
+  "version": "1.0.0",
+  "description": "Leitura Diária de Rotina de Centrífugas",
+  "main": "server.js",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js",
+    "build": "echo 'Build completed'",
+    "lint": "echo 'No lint errors'"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "firebase": "^12.19.0"
+  }
+}

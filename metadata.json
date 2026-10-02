@@ -1,0 +1,8 @@
+{
+  "name": "Leitura Diária de Rotina de Centrífugas",
+  "description": "Sistema de registro e relatório de leituras diárias de rotina de centrífugas e chillers.",
+  "permissions": [],
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

@@ -1,0 +1,139 @@
+{
+  "entities": {
+    "Reading": {
+      "title": "Reading",
+      "description": "Daily routine inspection reading for chillers and centrifuges",
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "string",
+          "description": "Date of reading (YYYY-MM-DD)"
+        },
+        "horario": {
+          "type": "string",
+          "description": "Target round time (HH:MM)"
+        },
+        "chiller": {
+          "type": "string",
+          "description": "Chiller identifier"
+        },
+        "nome_operador": {
+          "type": "string",
+          "description": "Operator name"
+        },
+        "ronda_status": {
+          "type": "boolean",
+          "description": "Cooling tower inspection status"
+        },
+        "temp_entrada_gel": {
+          "type": "number",
+          "description": "Chilled water inlet temp"
+        },
+        "temp_saida_gel": {
+          "type": "number",
+          "description": "Chilled water outlet temp"
+        },
+        "press_entrada_gel": {
+          "type": "number",
+          "description": "Chilled water inlet pressure"
+        },
+        "press_saida_gel": {
+          "type": "number",
+          "description": "Chilled water outlet pressure"
+        },
+        "delta_evap": {
+          "type": "number",
+          "description": "Evaporation delta approach temp"
+        },
+        "temp_entrada_con": {
+          "type": "number",
+          "description": "Condenser inlet temp"
+        },
+        "temp_saida_con": {
+          "type": "number",
+          "description": "Condenser outlet temp"
+        },
+        "delta_cond": {
+          "type": "number",
+          "description": "Condenser delta approach temp"
+        },
+        "press_entrada_con": {
+          "type": "number",
+          "description": "Condenser inlet pressure"
+        },
+        "press_saida_con": {
+          "type": "number",
+          "description": "Condenser outlet pressure"
+        },
+        "temp_oleo": {
+          "type": "number",
+          "description": "Oil temperature"
+        },
+        "press_util_oleo": {
+          "type": "number",
+          "description": "Useful oil pressure"
+        },
+        "nivel_oleo": {
+          "type": "string",
+          "description": "Crankcase oil level"
+        },
+        "press_evap": {
+          "type": "number",
+          "description": "Evaporation pressure"
+        },
+        "press_cond": {
+          "type": "number",
+          "description": "Condensation pressure"
+        },
+        "temp_evap": {
+          "type": "number",
+          "description": "Evaporation temperature"
+        },
+        "temp_cond": {
+          "type": "number",
+          "description": "Condensation temperature"
+        },
+        "volts_abrs": {
+          "type": "number",
+          "description": "Voltage ABRS"
+        },
+        "volts_acst": {
+          "type": "number",
+          "description": "Voltage ACST"
+        },
+        "volts_bcrt": {
+          "type": "number",
+          "description": "Voltage BCRT"
+        },
+        "amp_a": {
+          "type": "number",
+          "description": "Current phase A"
+        },
+        "amp_b": {
+          "type": "number",
+          "description": "Current phase B"
+        },
+        "amp_c": {
+          "type": "number",
+          "description": "Current phase C"
+        },
+        "demanda": {
+          "type": "number",
+          "description": "Demand percentage"
+        }
+      },
+      "required": [
+        "data",
+        "horario",
+        "chiller",
+        "nome_operador"
+      ]
+    }
+  },
+  "firestore": {
+    "/leituras_centrifugas/{readingId}": {
+      "schema": "Reading",
+      "description": "Collection of chiller daily readings"
+    }
+  }
+}

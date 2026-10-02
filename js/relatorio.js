@@ -1,4 +1,4 @@
-const _supabase = supabase.createClient('https://hnkwtzygwyelfjvutakm.supabase.co', 'sb_publishable_gKX0FdtJ2I6ax0TAFRMp5A_S1kNrBiS');
+import { buscarLeiturasFirestore } from './firebase-service.js';
 
 // Variáveis globais
 let chillerAtual = "1.1";
@@ -62,27 +62,40 @@ async function carregarRelatorio() {
 
         console.log(`🔍 Buscando: Data=${dataBusca} | Chiller=${chillerAtual}`);
 
-        // Consulta Supabase
-        const { data, error } = await _supabase
-            .from('leituras_centrifugas')
-            .select('*')
-            .eq('data', dataBusca)
-            .eq('chiller', chillerAtual)
-            .order('horario', { ascending: true });
-
-        if (error) {
-            console.error("❌ Erro Supabase:", error);
-            mostrarErro("Erro ao buscar dados: " + error.message);
-            return;
+        // Consulta Firebase Firestore com fallback local
+        let dadosCarregados = [];
+        try {
+            dadosCarregados = await buscarLeiturasFirestore(dataBusca, chillerAtual);
+            console.log(`🔥 Firestore retornou ${dadosCarregados.length} registros para Chiller ${chillerAtual}`);
+        } catch (errDb) {
+            console.warn("⚠️ Firebase indisponível ou offline no momento:", errDb);
         }
 
-        console.log(`✅ ${data?.length || 0} registros encontrados para Chiller ${chillerAtual}`);
+        // Mescla com registros locais do localStorage
+        try {
+            const locais = JSON.parse(localStorage.getItem('leituras_centrifugas_local') || '[]');
+            const locaisFiltrados = locais.filter(item => item.data === dataBusca && item.chiller === chillerAtual);
+            
+            locaisFiltrados.forEach(itemLocal => {
+                const index = dadosCarregados.findIndex(d => d.horario === itemLocal.horario);
+                if (index >= 0) {
+                    dadosCarregados[index] = { ...dadosCarregados[index], ...itemLocal };
+                } else {
+                    dadosCarregados.push(itemLocal);
+                }
+            });
+            dadosCarregados.sort((a, b) => (a.horario || '').localeCompare(b.horario || ''));
+        } catch (e) {
+            console.warn("Aviso ao ler localStorage:", e);
+        }
 
-        if (data && data.length > 0) {
-            processarRelatorio(data);
+        console.log(`✅ ${dadosCarregados?.length || 0} registros encontrados para Chiller ${chillerAtual}`);
+
+        if (dadosCarregados && dadosCarregados.length > 0) {
+            processarRelatorio(dadosCarregados);
         } else {
             limparTabela();
-            mostrarAviso(`Nenhum dado encontrado para o chiller ${chillerAtual} no dia de hoje.`);
+            mostrarAviso(`Nenhum dado encontrado para o chiller ${chillerAtual} no dia ${dataAtual.toLocaleDateString('pt-BR')}.`);
         }
 
     } catch (error) {
@@ -195,8 +208,9 @@ function processarRelatorio(dados) {
         }
 
         // ===== RONDA (CHECKBOXES) =====
-        // CORREÇÃO: Remova os dois pontos do horário para encontrar a classe
-        const horarioSemDoisPontos = horario.replace(':', ''); // "0200"
+        // Formata para 4 dígitos com zero à esquerda (ex: 0200, 0800, 1400, 2000)
+        const partesHorario = (horario || '').split(':');
+        const horarioSemDoisPontos = (partesHorario[0] || '').padStart(2, '0') + (partesHorario[1] || '00').padStart(2, '0');
 
         // Tenta os 3 formatos possíveis:
         let checkboxOk = document.querySelector(`.check-ok-${horarioSemDoisPontos}`); // .check-ok-0200
@@ -544,3 +558,10 @@ window.addEventListener('popstate', (e) => {
         carregarRelatorio();
     }
 });
+
+// Exporta funções para o escopo global (botões com onclick no HTML)
+window.mudarData = mudarData;
+window.hoje = hoje;
+window.atualizarComEmergencia = atualizarComEmergencia;
+window.mudarChiller = mudarChiller;
+window.carregarRelatorio = carregarRelatorio;

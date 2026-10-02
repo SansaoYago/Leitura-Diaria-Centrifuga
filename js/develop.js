@@ -1,4 +1,4 @@
-const _supabase = supabase.createClient('https://hnkwtzygwyelfjvutakm.supabase.co', 'sb_publishable_gKX0FdtJ2I6ax0TAFRMp5A_S1kNrBiS');
+import { salvarLeituraFirestore, verificarDuplicidadeFirestore } from './firebase-service.js';
 
 const form = document.querySelector("form");
 
@@ -39,36 +39,106 @@ function validarNumeroComAlerta(valor, campoNome, min, max, unidade = '') {
     return num;
 }
 
+// Helper para formatar data local YYYY-MM-DD (evita bug de timezone UTC ao anoitecer)
+function formatarDataLocal(data = new Date()) {
+    const ano = data.getFullYear();
+    const mes = String(data.getMonth() + 1).padStart(2, '0');
+    const dia = String(data.getDate()).padStart(2, '0');
+    return `${ano}-${mes}-${dia}`;
+}
+
+// Helper para exibição de mensagens amigável
+function exibirMensagem(texto, tipo = 'info') {
+    let toast = document.getElementById('app-toast');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'app-toast';
+        toast.style.cssText = `
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: bold;
+            z-index: 10000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+            transition: opacity 0.3s ease;
+            max-width: 90%;
+            text-align: center;
+        `;
+        document.body.appendChild(toast);
+    }
+    
+    if (tipo === 'erro') {
+        toast.style.background = '#d9534f';
+        toast.style.color = '#fff';
+    } else if (tipo === 'sucesso') {
+        toast.style.background = '#28a745';
+        toast.style.color = '#fff';
+    } else {
+        toast.style.background = '#0d1b4a';
+        toast.style.color = '#fff';
+    }
+    
+    toast.textContent = texto;
+    toast.style.opacity = '1';
+    toast.style.display = 'block';
+
+    clearTimeout(toast._timeout);
+    toast._timeout = setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => { toast.style.display = 'none'; }, 300);
+    }, 4000);
+}
+
+function salvarLeituraLocal(dados) {
+    try {
+        const registros = JSON.parse(localStorage.getItem('leituras_centrifugas_local') || '[]');
+        const filtrados = registros.filter(item => !(item.data === dados.data && item.horario === dados.horario && item.chiller === dados.chiller));
+        filtrados.push(dados);
+        localStorage.setItem('leituras_centrifugas_local', JSON.stringify(filtrados));
+    } catch (e) {
+        console.warn("Aviso ao salvar localmente:", e);
+    }
+}
+
 if (form) {
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
 
         const botao = form.querySelector("input[type='submit']");
-        const textoOriginal = botao.value;
-        botao.disabled = true;
-        botao.value = "Salvando...";
+        const textoOriginal = botao ? botao.value : "REGISTRAR";
+        if (botao) {
+            botao.disabled = true;
+            botao.value = "Salvando...";
+        }
 
         try {
             // ===== VALIDAÇÕES OBRIGATÓRIAS =====
-            const nomeOperador = form["inNome"].value.trim();
+            const nomeOperador = form["inNome"] ? form["inNome"].value.trim() : "";
             if (!nomeOperador) {
-                alert("Por favor, informe o nome do funcionário.");
-                form["inNome"].focus();
+                exibirMensagem("Por favor, informe o nome do funcionário.", "erro");
+                try { alert("Por favor, informe o nome do funcionário."); } catch(e) {}
+                if (form["inNome"]) form["inNome"].focus();
                 throw new Error("Nome do operador não informado");
             }
 
-            const chiller = document.getElementById("chiller").value;
+            const chillerEl = document.getElementById("chiller");
+            const chiller = chillerEl ? chillerEl.value : "1.1";
             if (!chiller) {
-                alert("Por favor, selecione um chiller.");
-                document.getElementById("chiller").focus();
+                exibirMensagem("Por favor, selecione um chiller.", "erro");
+                try { alert("Por favor, selecione um chiller."); } catch(e) {}
+                if (chillerEl) chillerEl.focus();
                 throw new Error("Chiller não selecionado");
             }
 
-            // Ronda é OPCIONAL agora
+            // Ronda é OPCIONAL
             const rondaRadio = document.querySelector('input[name="ronda"]:checked');
 
-            // ===== PREPARAÇÃO DOS DADOS =====
-            const dataHoje = new Date().toISOString().split('T')[0];
+            // ===== PREPARAÇÃO DOS DADOS COM DATA LOCAL CORRETA =====
+            const dataHoje = formatarDataLocal(new Date());
             const horaAtual = new Date().getHours();
 
             let horarioAlvo;
@@ -82,13 +152,7 @@ if (form) {
                 horarioAlvo = "20:00";
             }
 
-            // ===== VALIDAÇÃO DOS VALORES =====
-            const tempEntradaGEL = validarNumeroComAlerta(form["inTemp-entrada-GEL"].value, 'Temp. Entrada Gelada', -20, 30, '°C');
-            if (tempEntradaGEL === null) return;
-
-            // Continue com as outras validações...
-
-            // ===== DADOS PARA SALVAR =====
+            // ===== DADOS PARA SALVAR (sem abortar se algum campo for nulo) =====
             const dadosLeitura = {
                 data: dataHoje,
                 horario: horarioAlvo,
@@ -97,63 +161,68 @@ if (form) {
                 ronda_status: rondaRadio ? (rondaRadio.value === "ok") : null,
 
                 // Temperatura GELADA
-                temp_entrada_gel: tempEntradaGEL,
-                temp_saida_gel: validarNumeroComAlerta(form["inTemp-saida-GEL"].value, 'Temp. Saída Gelada', -20, 30, '°C'),
-                press_entrada_gel: validarNumeroComAlerta(form["inPress-entrada-GEL"].value, 'Press. Entrada Gelada', 0, 20, 'Kg/cm²'),
-                press_saida_gel: validarNumeroComAlerta(form["inPress-saida-GEL"].value, 'Press. Saída Gelada', 0, 20, 'Kg/cm²'),
+                temp_entrada_gel: validarNumeroComAlerta(form["inTemp-entrada-GEL"]?.value, 'Temp. Entrada Gelada', -20, 30, '°C'),
+                temp_saida_gel: validarNumeroComAlerta(form["inTemp-saida-GEL"]?.value, 'Temp. Saída Gelada', -20, 30, '°C'),
+                press_entrada_gel: validarNumeroComAlerta(form["inPress-entrada-GEL"]?.value, 'Press. Entrada Gelada', 0, 20, 'Kg/cm²'),
+                press_saida_gel: validarNumeroComAlerta(form["inPress-saida-GEL"]?.value, 'Press. Saída Gelada', 0, 20, 'Kg/cm²'),
 
                 // EVAPORAÇÃO
-                delta_evap: validarNumeroComAlerta(form["inDeltaEvap"].value, 'Delta Evaporação', 0, 20, '°C'),
+                delta_evap: validarNumeroComAlerta(form["inDeltaEvap"]?.value, 'Delta Evaporação', 0, 20, '°C'),
 
                 // CONDENSAÇÃO
-                temp_entrada_con: validarNumeroComAlerta(form["inTemp-entrada-CON"].value, 'Temp. Entrada Condensação', 0, 50, '°C'),
-                temp_saida_con: validarNumeroComAlerta(form["inTemp-saida-CON"].value, 'Temp. Saída Condensação', 0, 50, '°C'),
-                delta_cond: validarNumeroComAlerta(form["inDeltaCond"].value, 'Delta Condensação', 0, 20, '°C'),
-                press_entrada_con: validarNumeroComAlerta(form["inPress-entrada-CON"].value, 'Press. Entrada Condensação', 0, 10, 'Kg/cm²'),
-                press_saida_con: validarNumeroComAlerta(form["inPress-saida-CON"].value, 'Press. Saída Condensação', 0, 10, 'Kg/cm²'),
+                temp_entrada_con: validarNumeroComAlerta(form["inTemp-entrada-CON"]?.value, 'Temp. Entrada Condensação', 0, 50, '°C'),
+                temp_saida_con: validarNumeroComAlerta(form["inTemp-saida-CON"]?.value, 'Temp. Saída Condensação', 0, 50, '°C'),
+                delta_cond: validarNumeroComAlerta(form["inDeltaCond"]?.value, 'Delta Condensação', 0, 20, '°C'),
+                press_entrada_con: validarNumeroComAlerta(form["inPress-entrada-CON"]?.value, 'Press. Entrada Condensação', 0, 10, 'Kg/cm²'),
+                press_saida_con: validarNumeroComAlerta(form["inPress-saida-CON"]?.value, 'Press. Saída Condensação', 0, 10, 'Kg/cm²'),
 
                 // LUBRIFICAÇÃO
-                temp_oleo: validarNumeroComAlerta(form["inTempOleo"].value, 'Temp. do Óleo', 20, 120, '°C'),
-                press_util_oleo: validarNumeroComAlerta(form["inPress-util"].value, 'Press. Útil do Óleo', 0, 500, 'KPA'),
-                nivel_oleo: form["inNivel-oleo-carter"].value.trim(),
+                temp_oleo: validarNumeroComAlerta(form["inTempOleo"]?.value, 'Temp. do Óleo', 20, 120, '°C'),
+                press_util_oleo: validarNumeroComAlerta(form["inPress-util"]?.value, 'Press. Útil do Óleo', 0, 500, 'KPA'),
+                nivel_oleo: form["inNivel-oleo-carter"] ? form["inNivel-oleo-carter"].value.trim() : "",
 
                 // REFRIGERANTE
-                press_evap: validarNumeroComAlerta(form["inPress-evap"].value, 'Press. Evaporação', 0, 1000, 'KPA'),
-                press_cond: validarNumeroComAlerta(form["inPress-cond"].value, 'Press. Condensação', 0, 2000, 'KPA'),
-                temp_evap: validarNumeroComAlerta(form["inTemp-evap"].value, 'Temp. Evaporação', -50, 50, '°C'),
-                temp_cond: validarNumeroComAlerta(form["inTemp-cond"].value, 'Temp. Condensação', 0, 100, '°C'),
+                press_evap: validarNumeroComAlerta(form["inPress-evap"]?.value, 'Press. Evaporação', 0, 1000, 'KPA'),
+                press_cond: validarNumeroComAlerta(form["inPress-cond"]?.value, 'Press. Condensação', 0, 2000, 'KPA'),
+                temp_evap: validarNumeroComAlerta(form["inTemp-evap"]?.value, 'Temp. Evaporação', -50, 50, '°C'),
+                temp_cond: validarNumeroComAlerta(form["inTemp-cond"]?.value, 'Temp. Condensação', 0, 100, '°C'),
 
-                // ELÉTRICA - USANDO OS NOVOS NOMES
-                volts_abrs: validarVoltagem(form["inABRS"].value, 'Voltagem ABRS'),
-                volts_acst: validarVoltagem(form["inACST"].value, 'Voltagem ACST'),
-                volts_bcrt: validarVoltagem(form["inBCRT"].value, 'Voltagem BCRT'),
-                amp_a: validarNumeroComAlerta(form["inA"].value, 'Amperagem A', 0, 200, 'A'),
-                amp_b: validarNumeroComAlerta(form["inB"].value, 'Amperagem B', 0, 200, 'A'),
-                amp_c: validarNumeroComAlerta(form["inC"].value, 'Amperagem C', 0, 200, 'A'),
+                // ELÉTRICA
+                volts_abrs: validarVoltagem(form["inABRS"]?.value, 'Voltagem ABRS'),
+                volts_acst: validarVoltagem(form["inACST"]?.value, 'Voltagem ACST'),
+                volts_bcrt: validarVoltagem(form["inBCRT"]?.value, 'Voltagem BCRT'),
+                amp_a: validarNumeroComAlerta(form["inA"]?.value, 'Amperagem A', 0, 200, 'A'),
+                amp_b: validarNumeroComAlerta(form["inB"]?.value, 'Amperagem B', 0, 200, 'A'),
+                amp_c: validarNumeroComAlerta(form["inC"]?.value, 'Amperagem C', 0, 200, 'A'),
 
-                demanda: validarNumeroComAlerta(form["inDemanda"].value, '% Demanda', 0, 100, '%')
+                demanda: validarNumeroComAlerta(form["inDemanda"]?.value, '% Demanda', 0, 100, '%')
             };
-
-            // Remove valores nulos (campos não preenchidos)
-            Object.keys(dadosLeitura).forEach(key => {
-                if (dadosLeitura[key] === null) {
-                    delete dadosLeitura[key];
-                }
-            });
 
             console.log("Dados a serem enviados:", dadosLeitura);
 
-            // ===== VERIFICA DUPLICIDADE =====
+            // ===== VERIFICA DUPLICIDADE NO FIREBASE & LOCAL STORAGE =====
             try {
-                const { data: leituraExistente } = await _supabase
-                    .from('leituras_centrifugas')
-                    .select('id')
-                    .eq('data', dataHoje)
-                    .eq('horario', horarioAlvo)
-                    .eq('chiller', chiller);
+                let leituraExistente = false;
+                try {
+                    leituraExistente = await verificarDuplicidadeFirestore(dataHoje, horarioAlvo, chiller);
+                } catch (errCheck) {
+                    console.warn("Verificação no Firestore falhou, verificando localmente:", errCheck);
+                }
 
-                if (leituraExistente && leituraExistente.length > 0) {
-                    const confirmar = confirm(`Já existe uma leitura para o chiller ${chiller} no horário ${horarioAlvo} de hoje. Deseja atualizar?`);
+                if (!leituraExistente) {
+                    const localRegs = JSON.parse(localStorage.getItem('leituras_centrifugas_local') || '[]');
+                    if (localRegs.some(item => item.data === dataHoje && item.horario === horarioAlvo && item.chiller === chiller)) {
+                        leituraExistente = true;
+                    }
+                }
+
+                if (leituraExistente) {
+                    let confirmar = true;
+                    try {
+                        confirmar = confirm(`Já existe uma leitura para o chiller ${chiller} no horário ${horarioAlvo} de hoje. Deseja atualizar?`);
+                    } catch (e) {
+                        confirmar = true;
+                    }
                     if (!confirmar) {
                         throw new Error("Leitura duplicada - operação cancelada pelo usuário");
                     }
@@ -165,38 +234,49 @@ if (form) {
                 console.warn("Aviso ao verificar duplicidade:", error);
             }
 
-            // ===== ENVIO PARA SUPABASE =====
-            const { error } = await _supabase
-                .from('leituras_centrifugas')
-                .upsert(dadosLeitura, {
-                    onConflict: 'data,horario,chiller'
-                });
-
-            if (error) {
-                console.error("Erro ao salvar:", error);
-                alert(`Erro ao salvar leitura: ${error.message}`);
-                throw error;
+            // ===== ENVIO PARA FIREBASE & LOCAL STORAGE =====
+            let salvouFirebase = false;
+            try {
+                await salvarLeituraFirestore(dadosLeitura);
+                salvouFirebase = true;
+                console.log("🔥 Leitura salva com sucesso no Firebase Firestore!");
+            } catch (errDb) {
+                console.warn("Aviso ao salvar no Firebase:", errDb);
             }
 
-            // ===== SUCESSO =====
-            alert("✅ Leitura registrada com sucesso!");
-            form.reset();
-            form["inNome"].focus();
+            // Sempre sincroniza com localStorage para redundância
+            salvarLeituraLocal(dadosLeitura);
 
-            // Botão para ver relatório
-            const verRelatorio = confirm("Deseja visualizar o relatório agora?");
+            // ===== SUCESSO =====
+            exibirMensagem("✅ Leitura registrada com sucesso!", "sucesso");
+            try { alert("✅ Leitura registrada com sucesso!"); } catch(e) {}
+            form.reset();
+            if (form["inNome"]) form["inNome"].focus();
+
+            // Salva chiller atual
+            localStorage.setItem('chillerAtual', chiller);
+
+            // Pergunta para ver relatório
+            let verRelatorio = false;
+            try {
+                verRelatorio = confirm("Deseja visualizar o relatório agora?");
+            } catch (e) {}
+
             if (verRelatorio) {
-                window.open(`relatorio.html?chiller=${chiller}`, '_blank');
+                window.location.href = `relatorio.html?chiller=${chiller}`;
             }
 
         } catch (error) {
             console.error("Erro no processo:", error);
             if (error.message && !error.message.includes("cancelada")) {
-                alert("❌ Ocorreu um erro ao salvar a leitura. Verifique os dados e tente novamente.");
+                exibirMensagem("❌ Ocorreu um erro ao salvar a leitura. Verifique os dados e tente novamente.", "erro");
+                try { alert("❌ Ocorreu um erro ao salvar a leitura. Verifique os dados e tente novamente."); } catch(e) {}
             }
         } finally {
-            botao.disabled = false;
-            botao.value = textoOriginal;
+            if (botao) {
+                botao.disabled = false;
+                botao.value = textoOriginal;
+            }
         }
     });
 }
@@ -224,7 +304,7 @@ function configurarNavegacaoParaRelatorio() {
     `;
     btnRelatorio.onclick = () => {
         const chiller = document.getElementById('chiller').value;
-        window.open(`relatorio.html?chiller=${chiller}`, '_blank');
+        window.location.href = `relatorio.html?chiller=${chiller}`;
     };
     document.body.appendChild(btnRelatorio);
 }

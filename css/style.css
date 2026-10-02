@@ -1,87 +1,511 @@
 @charset "UTF-8";
 
+/* ==========================================================================
+   Paleta de Cores Heatingcooling
+   - Azul Institucional / Cooling: #0d1b4a / #1a357d / #004488
+   - Vermelho Térmico / Heating:   #e20612 / #c90510
+   - Neutros e Superfícies:        #f1f5f9 / #ffffff / #0f172a / #475569
+   ========================================================================== */
+
+:root {
+    --hc-navy-dark: #0d1b4a;
+    --hc-navy: #152b6d;
+    --hc-navy-light: #20429a;
+    --hc-red: #e20612;
+    --hc-red-hover: #c5040e;
+    --hc-cooling-blue: #0284c7;
+    --hc-cooling-bg: #f0f9ff;
+    
+    --bg-page: #f1f5f9;
+    --bg-card: #ffffff;
+    --bg-input: #f8fafc;
+    --border-color: #e2e8f0;
+    --border-input: #cbd5e1;
+    --border-focus: #0d1b4a;
+    
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #64748b;
+    
+    --shadow-sm: 0 1px 2px 0 rgba(13, 27, 74, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(13, 27, 74, 0.08), 0 2px 4px -2px rgba(13, 27, 74, 0.04);
+    --shadow-lg: 0 10px 15px -3px rgba(13, 27, 74, 0.1), 0 4px 6px -4px rgba(13, 27, 74, 0.05);
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+}
+
+/* Reset básico e tipografia */
 * {
     padding: 0;
     margin: 0;
     box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
 }
 
 body {
-    padding: 10px;
-    background-color: beige;
-    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    padding: 12px;
+    min-height: 100vh;
+    background-color: var(--bg-page);
+    background-image: radial-gradient(circle at 50% 0%, #e2e8f0 0%, #f1f5f9 60%);
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    color: var(--text-primary);
+    line-height: 1.5;
+}
+
+/* Container responsivo para Mobile e Tablet */
+.contain {
+    width: 100%;
+    max-width: 680px;
+    margin: 0 auto;
+    padding-bottom: 70px; /* Espaço para o botão flutuante e scroll confortável */
 }
 
 main {
-    width: fit-content;
-    margin: auto;
-    padding: 5px;
-    background-color: rgba(128, 128, 128, 0.299);
-    border-radius: 8px;
-    box-shadow: 0px 0px 7px 1px rgba(0, 0, 0, 0.277);
+    width: 100%;
+    background-color: var(--bg-card);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border-color);
+    padding: 18px 16px 24px;
+    position: relative;
+    overflow: hidden;
 }
 
+/* Linha superior decorativa com as cores da marca (Azul e Vermelho) */
+main::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--hc-navy-dark) 0%, var(--hc-navy) 60%, var(--hc-red) 100%);
+}
+
+/* Cabeçalho do formulário */
 h1 {
-    color: rgba(0, 0, 0, 0.671);
-    font-size: 18px;
+    color: var(--hc-navy-dark);
+    font-size: 1.15rem;
+    font-weight: 700;
     text-align: center;
-    padding: 4px 0px;
-    border-bottom: inset;
-    margin-bottom: 5px;
+    padding: 10px 4px 14px;
+    margin-bottom: 18px;
+    border-bottom: 2px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
 }
 
+h1 small {
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--text-muted);
+}
+
+/* Seção inicial: Funcionário e Chiller */
 section {
     display: flex;
-    justify-content: space-between;
-    margin-bottom: 10px;
+    flex-direction: column;
+    gap: 12px;
+    background: var(--bg-input);
+    padding: 14px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    margin-bottom: 20px;
 }
 
-select {
-    border-radius: 5px;
-    font-weight: bold;
+@media (min-width: 480px) {
+    section {
+        flex-direction: row;
+        align-items: flex-end;
+    }
 }
 
-fieldset {
-    padding: 15px;
-    border-color: rgba(0, 0, 0, 0.184);
-    margin-bottom: 10px;
+section label[for="inNome"] {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
 }
 
-legend {
+section label[for="inNome"] p {
+    font-size: 0.85rem;
     font-weight: 600;
-    color: rgb(255, 255, 255);
-    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.504);
-    padding: 0px 25px 0px 5px;
+    color: var(--hc-navy-dark);
+    margin-bottom: 6px;
+    padding: 0;
+}
+
+section input#inNome {
+    width: 100%;
+    height: 48px;
+    min-height: 48px;
+    padding: 0 14px;
+    font-size: 16px; /* Evita zoom automático no iOS */
+    border: 1.5px solid var(--border-input);
+    border-radius: var(--radius-sm);
+    background: #ffffff;
+    color: var(--text-primary);
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+section input#inNome:focus {
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 3px rgba(13, 27, 74, 0.12);
+    outline: none;
+}
+
+/* Seletor de Chiller */
+select#chiller {
+    height: 48px;
+    min-height: 48px;
+    padding: 0 16px;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--hc-navy-dark);
+    background-color: #ffffff;
+    border: 1.5px solid var(--border-input);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    align-self: stretch;
+}
+
+@media (min-width: 480px) {
+    select#chiller {
+        min-width: 130px;
+    }
+}
+
+select#chiller:focus {
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 3px rgba(13, 27, 74, 0.12);
+    outline: none;
+}
+
+/* Fieldsets - Cartões estruturados para cada subsistema */
+fieldset {
+    border: 1px solid var(--border-color);
+    background: #ffffff;
+    border-radius: var(--radius-md);
+    padding: 16px 12px 14px;
+    margin-bottom: 18px;
+    box-shadow: var(--shadow-sm);
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px 10px;
+}
+
+/* Legenda com estilo de crachá temático Heatingcooling */
+legend {
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: #ffffff;
+    background: var(--hc-navy-dark);
+    padding: 4px 12px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(13, 27, 74, 0.18);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Toque de destaque nas legendas com a cor Heating Vermelha */
+legend::before {
+    content: "•";
+    color: var(--hc-red);
+    font-size: 1.1rem;
+    line-height: 0;
+}
+
+/* Legenda de condensação/elétrica com acento visual */
+fieldset:nth-of-type(3) legend,
+fieldset:nth-of-type(6) legend {
+    background: linear-gradient(135deg, var(--hc-navy-dark) 0%, var(--hc-navy) 100%);
+}
+
+/* Labels e Textos dos Campos */
+label {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+label p {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 5px;
+    padding: 0;
+    line-height: 1.25;
+}
+
+/* Inputs numéricos e de texto nos fieldsets */
+input[type="number"],
+input[type="text"] {
+    width: 100%;
+    height: 48px;
+    min-height: 48px;
+    padding: 0 10px;
+    font-size: 16px; /* Evita zoom automático no iOS */
+    font-weight: 600;
+    color: var(--text-primary);
+    background-color: var(--bg-input);
+    border: 1.5px solid var(--border-input);
+    border-radius: var(--radius-sm);
+    transition: all 0.18s ease;
+    font-variant-numeric: tabular-nums;
+}
+
+input::placeholder {
+    color: #94a3b8;
+    font-weight: 400;
+    font-size: 0.82rem;
 }
 
 input:focus {
-    background-color: rgba(51, 234, 206, 0.399);
+    background-color: #ffffff;
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 3px rgba(13, 27, 74, 0.12);
+    outline: none;
 }
 
-p {
-    padding: 10px 0px;
+/* Ajustes de campos que ocupam largura inteira no grid */
+label[for="inDeltaEvap"],
+label[for="inDeltaCond"],
+label[for="inNivel-oleo-carter"],
+label[for="inDemanda"] {
+    grid-column: 1 / -1;
 }
 
+/* Seção de Ronda na Torre de Resfriamento */
+form > p {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--hc-navy-dark);
+    margin-top: 14px;
+    margin-bottom: 8px;
+    padding: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Labels dos rádios formatados como botões tocáveis confortáveis */
+label[for="inRondaOk"],
+label[for="inRondaNOk"] {
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    min-height: 50px;
+    width: 100%;
+    background: #ffffff;
+    border: 1.5px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    margin-bottom: 8px;
+    cursor: pointer;
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow-sm);
+}
+
+label[for="inRondaOk"]:hover,
+label[for="inRondaNOk"]:hover {
+    background: var(--bg-input);
+    border-color: #94a3b8;
+}
+
+/* Checkbox/Radio maior e confortável para toque */
+input[type="radio"] {
+    width: 22px;
+    height: 22px;
+    cursor: pointer;
+    accent-color: var(--hc-navy-dark);
+}
+
+input[type="radio"].NOk {
+    accent-color: var(--hc-red);
+}
+
+/* Efeito visual dinâmico quando selecionado */
+label[for="inRondaOk"]:has(input:checked) {
+    border-color: #16a34a;
+    background-color: #f0fdf4;
+    color: #15803d;
+}
+
+label[for="inRondaNOk"]:has(input:checked) {
+    border-color: var(--hc-red);
+    background-color: #fef2f2;
+    color: var(--hc-red);
+}
+
+/* Rodapé e Botão de Envio (CTA Principal) */
 footer {
+    margin-top: 20px;
+    padding: 0;
     text-align: center;
-    padding: 2px;
 }
 
 input[type="submit"] {
+    width: 100%;
+    height: 52px;
+    min-height: 52px;
+    background: linear-gradient(135deg, var(--hc-navy-dark) 0%, var(--hc-navy) 100%);
+    color: #ffffff;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
     cursor: pointer;
-    padding: 5px;
-    border-radius: 5px;
-    border: 1px solid rgba(0, 0, 0, 0.479);
+    box-shadow: 0 4px 12px rgba(13, 27, 74, 0.25);
+    transition: all 0.2s ease;
 }
 
-/* No computador, mostramos o texto completo */
+input[type="submit"]:hover {
+    background: linear-gradient(135deg, var(--hc-navy) 0%, var(--hc-navy-light) 100%);
+    box-shadow: 0 6px 16px rgba(13, 27, 74, 0.3);
+    transform: translateY(-1px);
+}
+
+input[type="submit"]:active {
+    transform: scale(0.99);
+    box-shadow: 0 2px 6px rgba(13, 27, 74, 0.2);
+}
+
+input[type="submit"]:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Botão Flutuante Responsivo de Acesso ao Relatório */
+.btn-responsivo {
+    box-shadow: 0 6px 18px rgba(13, 27, 74, 0.35) !important;
+    background: linear-gradient(135deg, var(--hc-navy-dark) 0%, var(--hc-navy) 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    transition: all 0.2s ease !important;
+    min-height: 46px;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px;
+}
+
+.btn-responsivo:hover {
+    background: linear-gradient(135deg, var(--hc-red) 0%, var(--hc-red-hover) 100%) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(226, 6, 18, 0.4) !important;
+}
+
+.btn-responsivo:active {
+    transform: scale(0.96);
+}
+
+/* Texto descritivo no botão flutuante */
 .btn-responsivo::after {
-    content: " Gerar Relatório";
+    content: " Ver Relatório";
+    font-size: 0.85rem;
+    font-weight: 700;
 }
 
-/* No celular, escondemos o texto e deixamos só o ícone */
-@media (max-width: 768px) {
+/* ==========================================================================
+   Responsividade: Celular (< 480px) e Tablet (481px a 1024px)
+   ========================================================================== */
+
+/* Celulares compactos */
+@media (max-width: 480px) {
+    body {
+        padding: 8px 6px;
+    }
+
+    main {
+        padding: 14px 10px 20px;
+        border-radius: var(--radius-md);
+    }
+
+    h1 {
+        font-size: 1.05rem;
+    }
+
+    fieldset {
+        padding: 14px 8px 12px;
+        gap: 10px 8px;
+    }
+
+    label p {
+        font-size: 0.74rem;
+    }
+
+    input[type="number"],
+    input[type="text"] {
+        height: 46px;
+        min-height: 46px;
+        padding: 0 8px;
+        font-size: 16px;
+    }
+
+    .btn-responsivo {
+        bottom: 20px !important;
+        right: 14px !important;
+        padding: 10px 14px !important;
+    }
+
     .btn-responsivo::after {
-        content: ""; 
+        content: " Relatório";
+    }
+}
+
+/* Tablets e Telas Maiores (>= 640px) */
+@media (min-width: 640px) {
+    body {
+        padding: 24px 16px;
+    }
+
+    .contain {
+        max-width: 720px;
+    }
+
+    main {
+        padding: 24px 28px 30px;
+    }
+
+    h1 {
+        font-size: 1.35rem;
+    }
+
+    fieldset {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 14px 18px;
+        padding: 18px 16px 16px;
+    }
+
+    /* Subsistemas com múltiplos inputs (Refrigerante, Elétrica, Gelada) */
+    fieldset:nth-of-type(1),
+    fieldset:nth-of-type(3),
+    fieldset:nth-of-type(5),
+    fieldset:nth-of-type(6) {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    label p {
+        font-size: 0.82rem;
+    }
+
+    /* Opções de rádio lado a lado no Tablet */
+    label[for="inRondaOk"],
+    label[for="inRondaNOk"] {
+        display: inline-flex;
+        width: 48%;
+        margin-right: 2%;
+        margin-bottom: 12px;
     }
 }
