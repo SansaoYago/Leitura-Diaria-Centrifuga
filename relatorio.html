@@ -34,8 +34,22 @@
             text-align: center;
         }
 
+        .th-logo {
+            padding: 3px !important;
+            text-align: center !important;
+            vertical-align: middle !important;
+            background: #ffffff !important;
+            overflow: visible !important;
+        }
+
         #logo {
-            width: 100px;
+            display: block;
+            width: auto;
+            max-width: 92%;
+            max-height: 32px;
+            height: auto;
+            margin: 0 auto;
+            object-fit: contain;
         }
 
         .text-vertical {
@@ -397,9 +411,21 @@
                 background: transparent !important;
             }
 
+            .th-logo {
+                padding: 1px !important;
+                vertical-align: middle !important;
+                text-align: center !important;
+                background: #ffffff !important;
+                overflow: hidden !important;
+            }
+
             #logo {
-                max-width: 58px !important;
-                max-height: 28px !important;
+                display: block !important;
+                width: auto !important;
+                max-width: 90% !important;
+                max-height: 26px !important;
+                height: auto !important;
+                margin: 0 auto !important;
                 object-fit: contain !important;
             }
 
@@ -429,10 +455,14 @@
 <body>
     <main class="contain">
         <table>
+            <colgroup>
+                <col style="width: 7.8%;">
+                <col style="width: 3.84%;" span="24">
+            </colgroup>
             <thead>
                 <tr>
-                    <th>
-                        <img id="logo" src="img/logo.png" alt="logo">
+                    <th class="th-logo">
+                        <img id="logo" src="img/logo.png" alt="Heating Cooling">
                     </th>
                     <th colspan="24">LEITURA DIÁRIA DE ROTINA DE CENTRIFUGAS</th>
                 </tr>
